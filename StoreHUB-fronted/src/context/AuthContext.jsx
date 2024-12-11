@@ -35,13 +35,19 @@ export const AuthProvider = ({ children }) => {
       const { data } = await apiClient.post("/login", credentials);
       setAuthToken(data.token);
       setAuthTokenState(data.token);
+  
+      // Fetch user details immediately after login
+      const { data: userData } = await apiClient.get("/users/me", {
+        headers: { Authorization: `Bearer ${data.token}` },
+      });
+      setUser(userData);
+  
       return data;
     } catch (error) {
       console.error("Login error:", error.message);
       throw new Error("Invalid login credentials");
     }
   };
-
   const logout = () => {
     removeAuthToken();
     setAuthTokenState(null);
