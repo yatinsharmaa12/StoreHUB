@@ -1,5 +1,5 @@
 export const setAuthToken = (token) => {
-  document.cookie = `Authorization=${token}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax;`;
+  document.cookie = `Authorization=${token}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=None;`;
   localStorage.setItem("token", token);
   console.log(document.cookie);
 };

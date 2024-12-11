@@ -17,6 +17,7 @@ func RequireAuth(c *gin.Context) {
 	// Retrieve the token from the "Authorization" cookie
 	tokenString, err := c.Cookie("Authorization")
 	if err != nil {
+		fmt.Printf(c.Cookie("Authorization"))
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized, no token found"})
 		c.Abort()
 		return

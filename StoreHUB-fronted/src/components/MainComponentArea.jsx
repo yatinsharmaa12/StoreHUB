@@ -1,47 +1,39 @@
 import React from "react";
 import { ThumbsUp, ThumbsDown, UserCircle2 } from "lucide-react";
-const ComponentCard = ({ 
-    image, 
-    title, 
-    summary, 
-    framework, 
-    type, 
-    author, 
-    likes, 
-    dislikes 
-  }) => {
+const ComponentCard = (card) => {
+  console.log(card)
     return (
       <div className="bg-white border border-black/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
         <div className="h-48 overflow-hidden">
           <img 
-            src={image || '/api/placeholder/400/300'} 
-            alt={title} 
+            src={card.image || '/api/placeholder/400/300'} 
+            alt={card.title} 
             className="w-full h-full object-cover"
           />
         </div>
         <div className="p-4">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-semibold">{title}</h3>
+            <h3 className="text-lg font-semibold">{card.title}</h3>
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-1">
                 <ThumbsUp className="text-black/60" size={16} />
-                <span>{likes}</span>
+                <span>{card.likes}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <ThumbsDown className="text-black/60" size={16} />
-                <span>{dislikes}</span>
+                <span>{card.user.username}</span>
               </div>
             </div>
           </div>
-          <p className="text-black/60 mb-2">{summary}</p>
+          <p className="text-black/60 mb-2">{card.description}</p>
           <div className="flex justify-between items-center">
             <div className="flex space-x-2">
-              <span className="bg-black/10 px-2 py-1 rounded text-xs">{framework}</span>
-              <span className="bg-black/10 px-2 py-1 rounded text-xs">{type}</span>
+              <span className="bg-black/10 px-2 py-1 rounded text-xs">{card.framework}</span>
+              <span className="bg-black/10 px-2 py-1 rounded text-xs">{card.componentType}</span>
             </div>
             <div className="flex items-center space-x-1 text-black/60">
               <UserCircle2 size={16} />
-              <span className="text-sm">{author}</span>
+              <span className="text-sm">{}</span>
             </div>
           </div>
         </div>
