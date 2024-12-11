@@ -68,3 +68,27 @@ func DeleteUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
+
+func GetCurrentUser(c *gin.Context) {
+	// Retrieve the user from the context (set by RequireAuth middleware)
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Type assert the user to the User model
+	authenticatedUser, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user details"})
+		return
+	}
+
+	// Return the user details (exclude sensitive fields like password)
+	c.JSON(http.StatusOK, gin.H{
+		"id":    authenticatedUser.ID,
+		"email": authenticatedUser.Email,
+		"username":  authenticatedUser.Username,
+		// Add other non-sensitive fields if needed
+	})
+}

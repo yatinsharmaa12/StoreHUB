@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, User } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -19,36 +20,16 @@ const LoginPage = () => {
       [name]: value
     }));
   };
-
+  const {login} = useAuth()
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null); // Reset error on new submission
 
     try {
-      // Send login request to backend
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // If successful, store the token (e.g., in localStorage or cookies)
-        localStorage.setItem('token', data.token);
-        // Optionally, redirect the user after successful login
-        navigate("/") // Redirect to a protected page
-      } else {
-        // If error, set error state to show an error message
-        setError(data.error || 'Something went wrong');
-      }
+     const response =  await login(formData);
+      navigate('/');
+     
     } catch (err) {
       console.error('Login failed:', err);
       setError('Network error, please try again');

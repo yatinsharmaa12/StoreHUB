@@ -23,7 +23,7 @@ func main() {
 	// Enable CORS middleware with specific options
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"},                             // Allow frontend domain
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},                      // Allowed methods
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE",  "OPTIONS"},                      // Allowed methods
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"}, // Allowed headers
 		AllowCredentials: true,                                                          // Allow cookies and authorization headers
 	}))
@@ -38,18 +38,22 @@ func main() {
 	r.GET("/users/:email", middlewares.RequireAuth, controllers.GetUserByEmail)     // Fetch specific user by email
 	r.POST("/users/:email/photo", middlewares.RequireAuth, controllers.UploadPhoto) // Upload profile photo
 	r.DELETE("/users/:email", middlewares.RequireAuth, controllers.DeleteUser)      // Delete user
+	r.GET("/users/me", middlewares.RequireAuth, controllers.GetCurrentUser)                  // Fetch current user
+
 
 	// Post routes
 	r.POST("/posts", middlewares.RequireAuth, controllers.CreatePost)     // Create a post
+	r.GET("/posts", middlewares.RequireAuth, controllers.GetAllPosts)               // Fetch all posts
+	r.GET("/posts/:id", middlewares.RequireAuth, controllers.GetPostByID)           // Fetch specific post by ID
 
 	// Comment routes
 	r.POST("/comments", middlewares.RequireAuth, controllers.CreateComment)        // Add a comment to a post
-	r.GET("/posts/:id/comments", middlewares.RequireAuth, controllers.GetComments) // Get all comments for a post
-	r.DELETE("/comments/:id", middlewares.RequireAuth, controllers.DeleteComment)  // Delete a comment
+	// r.GET("/posts/:id/comments", middlewares.RequireAuth, controllers.GetComments) // Get all comments for a post
+	// r.DELETE("/comments/:id", middlewares.RequireAuth, controllers.DeleteComment)  // Delete a comment
 
 	// Like routes
 	r.POST("/likes", middlewares.RequireAuth, controllers.CreateLike)        // Add a like to a post
-	r.GET("/posts/:id/likes", middlewares.RequireAuth, controllers.GetLikes) // Get all likes for a post
-	r.DELETE("/likes/:id", middlewares.RequireAuth, controllers.DeleteLike)  // Remove a like
+	// r.GET("/posts/:id/likes", middlewares.RequireAuth, controllers.GetLikes) // Get all likes for a post
+	// r.DELETE("/likes/:id", middlewares.RequireAuth, controllers.DeleteLike)  // Remove a like
 	r.Run(":3000")                                                           // Add the port explicitly (e.g., :3000)
 }

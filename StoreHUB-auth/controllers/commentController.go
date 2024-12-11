@@ -10,38 +10,51 @@ import (
 
 // CreateComment creates a new comment
 func CreateComment(c *gin.Context) {
-	var comment models.Comment
-	if err := c.ShouldBindJSON(&comment); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-		return
-	}
+    postID := c.Param("postId")
+    
+    var body struct {
+        Content string `json:"content" binding:"required"`
+    }
+    if err := c.ShouldBindJSON(&body); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	if err := initializers.DB.Create(&comment).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"comment": comment})
-}
+    user, exists := c.Get("user")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+        return
+    }
+    currentUser, ok := user.(*models.User)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user type"})
+        return
+    }
 
-func GetComments(c *gin.Context) {
-	postID := c.Param("id")
+    // Check if post exists
+    var post models.Post
+    if err := initializers.DB.First(&post, postID).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+        return
+    }
 
-	var comments []models.Comment
-	if err := initializers.DB.Where("post_id = ?", postID).Find(&comments).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch comments", "details": err.Error()})
-		return
-	}
+    // Create new comment
+    comment := models.Comment{
+        UserID:  currentUser.ID,
+        PostID:  post.ID,
+        Content: body.Content,
+    }
 
-	c.JSON(http.StatusOK, gin.H{"comments": comments})
-}
+    if err := initializers.DB.Create(&comment).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to create comment",
+            "details": err.Error(),
+        })
+        return
+    }
 
-func DeleteComment(c *gin.Context) {
-	commentID := c.Param("id")
-
-	if err := initializers.DB.Delete(&models.Comment{}, "id = ?", commentID).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete comment", "details": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Comment added successfully",
+        "comment": comment,
+    })
 }

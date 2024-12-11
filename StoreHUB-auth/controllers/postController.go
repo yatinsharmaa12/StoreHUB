@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/rishyym0927/StoreHUB-auth/initializers"
 	"github.com/rishyym0927/StoreHUB-auth/models"
@@ -71,5 +70,165 @@ func CreatePost(c *gin.Context) {
 }
 
 
+func GetAllPosts(c *gin.Context) {
+    var posts []models.Post
+    
+    // Optional query parameters for filtering
+    framework := c.Query("framework")
+    componentType := c.Query("componentType")
 
+    // Base query with preloading related data
+    query := initializers.DB.Preload("User").
+        Preload("Likes").
+        Preload("Likes.User").
+        Preload("Comments").
+        Preload("Comments.User")
 
+    // Apply filters if provided
+    if framework != "" {
+        query = query.Where("framework = ?", framework)
+    }
+    if componentType != "" {
+        query = query.Where("component_type = ?", componentType)
+    }
+
+    // Execute query
+    result := query.Find(&posts)
+    if result.Error != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to retrieve posts",
+            "details": result.Error.Error(),
+        })
+        return
+    }
+
+    // Process posts to parse images and prepare response
+    processedPosts := make([]gin.H, len(posts))
+    for i, post := range posts {
+        var images []string
+        if post.Images != "" {
+            json.Unmarshal([]byte(post.Images), &images)
+        }
+
+        // Process likes
+        likes := make([]gin.H, len(post.Likes))
+        for j, like := range post.Likes {
+            likes[j] = gin.H{
+                "id": like.ID,
+                "user": gin.H{
+                    "id":       like.User.ID,
+                    "username": like.User.Username,
+                },
+            }
+        }
+
+        // Process comments
+        comments := make([]gin.H, len(post.Comments))
+        for j, comment := range post.Comments {
+            comments[j] = gin.H{
+                "id":      comment.ID,
+                "content": comment.Content,
+                "user": gin.H{
+                    "id":       comment.User.ID,
+                    "username": comment.User.Username,
+                },
+                "createdAt": comment.CreatedAt,
+            }
+        }
+
+        processedPosts[i] = gin.H{
+            "id":            post.ID,
+            "title":         post.Title,
+            "description":   post.Description,
+            "images":        images,
+            "codeSnippet":   post.CodeSnippet,
+            "framework":     post.Framework,
+            "componentType": post.ComponentType,
+            "user": gin.H{
+                "id":       post.User.ID,
+                "username": post.User.Username,
+            },
+            "likes":    likes,
+            "comments": comments,
+            "createdAt": post.CreatedAt,
+        }
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "posts": processedPosts,
+        "count": len(processedPosts),
+    })
+}
+
+// GetPostByID retrieves a single post by its ID with detailed information
+func GetPostByID(c *gin.Context) {
+    postID := c.Param("id")
+
+    var post models.Post
+    result := initializers.DB.
+        Preload("User").
+        Preload("Likes").
+        Preload("Likes.User").
+        Preload("Comments").
+        Preload("Comments.User").
+        First(&post, postID)
+
+    if result.Error != nil {
+        c.JSON(http.StatusNotFound, gin.H{
+            "error": "Post not found",
+            "details": result.Error.Error(),
+        })
+        return
+    }
+
+    // Parse images
+    var images []string
+    if post.Images != "" {
+        json.Unmarshal([]byte(post.Images), &images)
+    }
+
+    // Process likes
+    likes := make([]gin.H, len(post.Likes))
+    for j, like := range post.Likes {
+        likes[j] = gin.H{
+            "id": like.ID,
+            "user": gin.H{
+                "id":       like.User.ID,
+                "username": like.User.Username,
+            },
+        }
+    }
+
+    // Process comments
+    comments := make([]gin.H, len(post.Comments))
+    for j, comment := range post.Comments {
+        comments[j] = gin.H{
+            "id":      comment.ID,
+            "content": comment.Content,
+            "user": gin.H{
+                "id":       comment.User.ID,
+                "username": comment.User.Username,
+            },
+            "createdAt": comment.CreatedAt,
+        }
+    }
+
+    postResponse := gin.H{
+        "id":            post.ID,
+        "title":         post.Title,
+        "description":   post.Description,
+        "images":        images,
+        "codeSnippet":   post.CodeSnippet,
+        "framework":     post.Framework,
+        "componentType": post.ComponentType,
+        "user": gin.H{
+            "id":       post.User.ID,
+            "username": post.User.Username,
+        },
+        "likes":    likes,
+        "comments": comments,
+        "createdAt": post.CreatedAt,
+    }
+
+    c.JSON(http.StatusOK, postResponse)
+}
