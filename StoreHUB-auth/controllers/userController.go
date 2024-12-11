@@ -77,7 +77,7 @@ func GetCurrentUser(c *gin.Context) {
 	}
 
 	// Type assert the user to the User model
-	authenticatedUser, ok := user.(models.User)
+	authenticatedUser, ok := user.(*models.User)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user details"})
 		return

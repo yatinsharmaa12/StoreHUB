@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -58,6 +59,7 @@ func Signup(c *gin.Context) {
 
 // Login handles user authentication
 func Login(c *gin.Context) {
+	fmt.Println("Starting Login function")
 	// Struct to bind incoming JSON data
 	var body struct {
 		Email    string `json:"email" binding:"required,email"`
@@ -66,9 +68,12 @@ func Login(c *gin.Context) {
 
 	// Validate incoming request body
 	if err := c.ShouldBindJSON(&body); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input parameters", "details": err.Error()})
 		return
 	}
+
+	fmt.Printf("Request body: %+v\n", body)
 
 	// Find user by email
 	var user models.User
@@ -77,11 +82,15 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("User found: %+v\n", user)
+
 	// Compare hashed password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
+
+	fmt.Println("Password verified successfully")
 
 	// Create JWT token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
