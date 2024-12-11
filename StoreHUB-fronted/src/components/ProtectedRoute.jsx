@@ -9,6 +9,10 @@ const ProtectedRoute = ({ children }) => {
     return <div>Loading...</div>;
   }
 
+  if(user===null) {
+    return <Navigate to="/login" replace />;
+  }
+
   return user ? children : <Navigate to="/login" replace />;
 };
 
