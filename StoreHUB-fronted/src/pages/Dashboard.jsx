@@ -4,11 +4,11 @@ import Navbar from "../components/Navbar";
 
 import MainComponentArea from "../components/MainComponentArea";
 import Sidebar from "../components/Sidebar";
-import img1 from '../assets/logo.png';
+
 const Dashboard = () => {
   const sampleComponents = [
     {
-      image: {img1},
+      image: "",
       title: 'Modern Button Component',
       summary: 'A sleek, responsive button with multiple variants',
       framework: 'React',
