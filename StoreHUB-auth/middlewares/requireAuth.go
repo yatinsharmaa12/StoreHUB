@@ -46,17 +46,27 @@ func RequireAuth(c *gin.Context) {
 			c.Abort()
 			return
 		}
+		fmt.Printf("JWT Claims: %+v\n", claims)
+
+		userID, ok := claims["sub"].(float64)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
+			c.Abort()
+			return
+		}
+		fmt.Printf("Looking for user with ID: %v\n", userID)
 
 		// Retrieve the user from the database using the 'sub' claim (user ID)
 		var user models.User
-		if err := initializers.DB.First(&user, claims["sub"]).Error; err != nil || user.ID == 0 {
+		if err := initializers.DB.First(&user, uint(userID)).Error; err != nil || user.ID == 0 {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 			c.Abort()
 			return
 		}
 
-		// Set the user in the context for further use
-		c.Set("user", user)
+		// Set the user in the context for further use (use a pointer)
+		c.Set("user", &user)
+		fmt.Printf("Setting user in context: %+v\n", user)
 		c.Next()
 
 		// Optionally, log the claims for debugging purposes (remove in production)

@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rishyym0927/StoreHUB-auth/initializers"
 	"github.com/rishyym0927/StoreHUB-auth/models"
-	"encoding/json"
 )
 
 // CreatePost creates a new post
@@ -28,7 +30,7 @@ func CreatePost(c *gin.Context) {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
         return
     }
-
+    fmt.Printf("User from context (type assertion): %+v\n", user)
     currentUser, ok := user.(*models.User)
     if !ok {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user type"})
