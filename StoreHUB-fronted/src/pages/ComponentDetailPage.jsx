@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Code, 
-  Copy, 
-  Download, 
-  Star, 
-  ThumbsUp, 
-  ThumbsDown, 
-  Share2, 
+import React, { useState, useEffect } from "react";
+import {
+  Code,
+  Copy,
+  Download,
+  Star,
+  ThumbsUp,
+  ThumbsDown,
+  Share2,
   GitBranch,
   UserCircle2,
   MessageCircle,
   ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
-import Navbar from '../components/Navbar';
-import apiClient from '../utils/apiClient';
-import { useParams } from 'react-router-dom';
+  ChevronRight,
+} from "lucide-react";
+import Navbar from "../components/Navbar";
+import apiClient from "../utils/apiClient";
+import { useParams } from "react-router-dom";
 
 const ComponentDetailPage = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [copied, setCopied] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { id } = useParams();
@@ -30,7 +30,7 @@ const ComponentDetailPage = () => {
         const response = await apiClient.get(`/posts/${id}`);
         setComponentData(response.data);
       } catch (error) {
-        console.error('Error fetching component data:', error);
+        console.error("Error fetching component data:", error);
       }
     };
     fetchComponentData();
@@ -39,10 +39,10 @@ const ComponentDetailPage = () => {
   // Show loading state if data is not yet fetched
   if (!componentData) return <div>Loading...</div>;
 
-
   const handleImageChange = (direction) => {
+    if (!componentData?.images?.length) return;
     setCurrentImageIndex((prevIndex) => {
-      if (direction === 'next') {
+      if (direction === "next") {
         return (prevIndex + 1) % componentData.images.length;
       } else {
         return prevIndex === 0
@@ -56,18 +56,18 @@ const ComponentDetailPage = () => {
     <button
       className={`px-4 py-2 border-b-2 transition-colors ${
         activeTab === tab
-          ? 'border-black text-black'
-          : 'border-transparent text-black/60 hover:text-black'
+          ? "border-black text-black"
+          : "border-transparent text-black/60 hover:text-black"
       }`}
       onClick={() => setActiveTab(tab)}
     >
       {label}
     </button>
   );
-console.log(componentData)
+  console.log(componentData);
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'overview':
+      case "overview":
         return (
           <div className="space-y-4">
             <p className="text-black/70">{componentData.description}</p>
@@ -96,7 +96,7 @@ console.log(componentData)
             </div>
           </div>
         );
-      case 'code':
+      case "code":
         return (
           <div className="relative h-96 overflow-y-scroll">
             <pre className="bg-black/5 p-4 rounded-lg overflow-x-auto">
@@ -106,11 +106,11 @@ console.log(componentData)
               // onClick={copyToClipboard}
               className="absolute top-2 right-2 bg-black/10 p-2 rounded hover:bg-black/20 transition-colors"
             >
-              {copied ? 'Copied!' : <Copy size={20} />}
+              {copied ? "Copied!" : <Copy size={20} />}
             </button>
           </div>
         );
-      case 'comments':
+      case "comments":
         return (
           <div className="space-y-4 h-80 overflow-y-scroll">
             {componentData.comments.map((comment, index) => (
@@ -148,42 +148,51 @@ console.log(componentData)
       <div className="container mx-auto px-4 py-8 mt-24">
         <div className="grid grid-cols-2 gap-8">
           {/* Image Carousel Section */}
+          {/* Image Carousel Section */}
           <div className="relative">
-            <div className="rounded-lg overflow-hidden shadow-lg h-[570px] w-[570px]">
-              <img
-                src={componentData.images[currentImageIndex]}
-                alt={`Component preview ${currentImageIndex + 1}`}
-                className="w-full h-96 object-cover"
-              />
-            </div>
-            {/* Image Navigation */}
-            {componentData.images.length > 1 && (
+            {componentData?.images?.length > 0 ? (
               <>
-                <button
-                  onClick={() => handleImageChange('prev')}
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/20 p-2 rounded-full"
-                >
-                  <ChevronLeft className="text-white" />
-                </button>
-                <button
-                  onClick={() => handleImageChange('next')}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/20 p-2 rounded-full"
-                >
-                  <ChevronRight className="text-white" />
-                </button>
+                <div className="rounded-lg overflow-hidden shadow-lg h-[570px] w-[570px]">
+                  <img
+                    src={componentData.images[currentImageIndex]}
+                    alt={`Component preview ${currentImageIndex + 1}`}
+                    className="w-full h-96 object-cover"
+                  />
+                </div>
+                {/* Image Navigation */}
+                {componentData.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => handleImageChange("prev")}
+                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/20 p-2 rounded-full"
+                    >
+                      <ChevronLeft className="text-white" />
+                    </button>
+                    <button
+                      onClick={() => handleImageChange("next")}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/20 p-2 rounded-full"
+                    >
+                      <ChevronRight className="text-white" />
+                    </button>
+                  </>
+                )}
+                {/* Image Indicators */}
+                <div className="flex justify-center mt-4 space-x-2">
+                  {componentData.images.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-2 h-2 rounded-full ${
+                        index === currentImageIndex ? "bg-black" : "bg-black/30"
+                      }`}
+                    />
+                  ))}
+                </div>
               </>
+            ) : (
+              <div className="h-[570px] w-[570px] flex items-center justify-center bg-black/10 rounded-lg">
+                <p className="text-black/50">No images available</p>
+              </div>
             )}
-            {/* Image Indicators */}
-            <div className="flex justify-center mt-4 space-x-2">
-              {componentData.images.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full ${
-                    index === currentImageIndex ? 'bg-black' : 'bg-black/30'
-                  }`}
-                />
-              ))}
-            </div>
           </div>
 
           {/* Content Section */}

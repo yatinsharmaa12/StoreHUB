@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ImagePlus, Save, X, Plus } from 'lucide-react';
+import apiClient from '../utils/apiClient';
 
 const PostCreatePage = () => {
   const [title, setTitle] = useState('');
@@ -19,17 +20,27 @@ const PostCreatePage = () => {
     setImages(prevImages => prevImages.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const postData = {
-      title,
-      description,
-      framework,
-      type,
-      codeSnippet,
-      images
-    };
-    console.log('Post submitted:', postData);
+    
+    try {
+      const postData = { title, description, framework, type, codeSnippet, images };
+      
+      const response = await apiClient.post('/posts', postData);
+      console.log('Post submitted:', response.data);
+  
+      // Clear form inputs after successful submission
+      setTitle('');
+      setDescription('');
+      setFramework('');
+      setType('');
+      setCodeSnippet('');
+      setImages([]);
+      alert('Post created successfully!');
+    } catch (error) {
+      console.error('Error creating post:', error.response?.data || error.message);
+      alert('Failed to create post. Please try again.');
+    }
   };
 
   return (
