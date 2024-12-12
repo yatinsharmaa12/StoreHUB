@@ -18,42 +18,41 @@ func main() {
 	
 
 	r := gin.Default()
-
-	
-	// Enable CORS middleware with specific options
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},                             // Allow frontend domain
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE",  "OPTIONS"},                      // Allowed methods
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"}, // Allowed headers
-		AllowCredentials: true,                                                          // Allow cookies and authorization headers
+		AllowOrigins:     []string{"http://localhost:5173"},                             
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE",  "OPTIONS"},                    
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"}, 
+		AllowCredentials: true,                                                        
 	}))
 
 	// Authentication routes
-	r.POST("/signup", controllers.Signup)                             // User signup
-	r.POST("/login", controllers.Login)                               // User login
-	r.GET("/validate", middlewares.RequireAuth, controllers.Validate) // Validate user token
+	r.POST("/signup", controllers.Signup)                             
+	r.POST("/login", controllers.Login)       
+
+	r.GET("/validate", middlewares.RequireAuth, controllers.Validate) 
 
 	// User routes
-	r.GET("/users", middlewares.RequireAuth, controllers.GetAllUsers)               // Fetch all users
-	r.GET("/users/:email", middlewares.RequireAuth, controllers.GetUserByEmail)     // Fetch specific user by email
-	r.POST("/users/:email/photo", middlewares.RequireAuth, controllers.UploadPhoto) // Upload profile photo
-	r.DELETE("/users/:email", middlewares.RequireAuth, controllers.DeleteUser)      // Delete user
-	r.GET("/users/me", middlewares.RequireAuth, controllers.GetCurrentUser)                  // Fetch current user
+	r.GET("/users", middlewares.RequireAuth, controllers.GetAllUsers)              
+	r.GET("/users/:email", middlewares.RequireAuth, controllers.GetUserByEmail)    
+	r.POST("/users/:email/photo", middlewares.RequireAuth, controllers.UploadPhoto) 
+	r.DELETE("/users/:email", middlewares.RequireAuth, controllers.DeleteUser)      
+	r.GET("/users/me", middlewares.RequireAuth, controllers.GetCurrentUser)               
 
 
 	// Post routes
-	r.POST("/posts", middlewares.RequireAuth, controllers.CreatePost)     // Create a post
-	r.GET("/posts", middlewares.RequireAuth, controllers.GetAllPosts)               // Fetch all posts
-	r.GET("/posts/:id", middlewares.RequireAuth, controllers.GetPostByID)           // Fetch specific post by ID
+	r.POST("/posts", middlewares.RequireAuth, controllers.CreatePost)     
+	r.GET("/posts", middlewares.RequireAuth, controllers.GetAllPosts)               
+	r.GET("/posts/:id", middlewares.RequireAuth, controllers.GetPostByID)           
 
 	// Comment routes
-	r.POST("/comments", middlewares.RequireAuth, controllers.CreateComment)        // Add a comment to a post
-	// r.GET("/posts/:id/comments", middlewares.RequireAuth, controllers.GetComments) // Get all comments for a post
-	// r.DELETE("/comments/:id", middlewares.RequireAuth, controllers.DeleteComment)  // Delete a comment
+	r.POST("/comments", middlewares.RequireAuth, controllers.CreateComment)        
+	// r.GET("/posts/:id/comments", middlewares.RequireAuth, controllers.GetComments) 
+	// r.DELETE("/comments/:id", middlewares.RequireAuth, controllers.DeleteComment) 
 
 	// Like routes
-	r.POST("/likes", middlewares.RequireAuth, controllers.CreateLike)        // Add a like to a post
-	// r.GET("/posts/:id/likes", middlewares.RequireAuth, controllers.GetLikes) // Get all likes for a post
-	// r.DELETE("/likes/:id", middlewares.RequireAuth, controllers.DeleteLike)  // Remove a like
-	r.Run(":3000")                                                           // Add the port explicitly (e.g., :3000)
+	r.POST("/likes", middlewares.RequireAuth, controllers.CreateLike)       
+	// r.GET("/posts/:id/likes", middlewares.RequireAuth, controllers.GetLikes) 
+	// r.DELETE("/likes/:id", middlewares.RequireAuth, controllers.DeleteLike) 
+	
+	r.Run(":3000")                                                          
 }
