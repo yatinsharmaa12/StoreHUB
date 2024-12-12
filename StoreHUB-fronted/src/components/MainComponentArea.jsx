@@ -21,7 +21,7 @@ const ComponentCard = (card) => {
               </div>
               <div className="flex items-center space-x-1">
                 <ThumbsDown className="text-black/60" size={16} />
-                <span>{card.user.username}</span>
+                <span>{}</span>
               </div>
             </div>
           </div>
