@@ -1,6 +1,6 @@
 # Ignore node_modules (for frontend and backend)
 node_modules/
- 
+certs/
 # Ignore build files (frontend)
 frontend/build/
  
