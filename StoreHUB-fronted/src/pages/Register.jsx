@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Lock, User, Mail, KeyRound, UserPlus } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../utils/apiClient';
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -47,7 +48,8 @@ const SignupPage = () => {
 
     try {
       // Send POST request to backend API
-      const response = await axios.post('http://localhost:3000/signup', requestBody);
+      
+      const response = await apiClient.post('/signup', requestBody);
 
       if (response.status === 200) {
         console.log('User created successfully');
