@@ -101,7 +101,7 @@ const LoginPage = () => {
               Don't have an account?{' '}
               <button
                 type="button"
-                onClick={() => console.log('Switch to Signup')}
+                onClick={() => navigate('/register')}
                 className="text-black font-semibold hover:underline"
               >
                 Sign Up

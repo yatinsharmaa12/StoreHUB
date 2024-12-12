@@ -1,5 +1,6 @@
 import React from "react";
 import { ThumbsUp, ThumbsDown, UserCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
 const ComponentCard = (card) => {
   console.log(card)
     return (
@@ -21,7 +22,7 @@ const ComponentCard = (card) => {
               </div>
               <div className="flex items-center space-x-1">
                 <ThumbsDown className="text-black/60" size={16} />
-                <span>{}</span>
+                <span></span>
               </div>
             </div>
           </div>
@@ -33,7 +34,7 @@ const ComponentCard = (card) => {
             </div>
             <div className="flex items-center space-x-1 text-black/60">
               <UserCircle2 size={16} />
-              <span className="text-sm">{}</span>
+              <span className="text-sm">{card.user?card.user.username :"anonymous"}</span>
             </div>
           </div>
         </div>
@@ -46,7 +47,7 @@ const ComponentCard = (card) => {
     return (
       <div className="ml-64 mt-16 p-6 grid grid-cols-3 gap-6">
         {components.map((component, idx) => (
-          <ComponentCard key={idx} {...component} />
+          <Link to={`/post/${component.id}`}><ComponentCard key={idx} {...component} /></Link>
           
         ))}
       </div>

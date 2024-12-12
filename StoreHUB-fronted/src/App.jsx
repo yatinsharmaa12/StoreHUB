@@ -30,13 +30,15 @@ const App = () => {
               } 
             />
             <Route 
-              path="/component" 
+              path="/post/:id" 
               element={
                 <ProtectedRoute>
                   <ComponentDetailPage />
                 </ProtectedRoute>
               } 
             />
+
+
             <Route 
               path="/profile" 
               element={
