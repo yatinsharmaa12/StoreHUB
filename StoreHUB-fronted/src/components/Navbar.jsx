@@ -36,9 +36,10 @@ const Navbar = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="text-black border-black/70 border px-4 py-2 rounded-lg flex items-center">
+            <Link to={"/create"}><button className="text-black border-black/70 border px-4 py-2 rounded-lg flex items-center">
               Create
-            </button>
+            </button></Link>
+            
             <Link to="/profile">
               <div className="flex items-center space-x-2">
                 <UserCircle2 className="text-black/70" size={40} />
