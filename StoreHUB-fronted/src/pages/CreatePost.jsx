@@ -20,6 +20,14 @@ const PostCreatePage = () => {
     setImages(prevImages => prevImages.filter((_, index) => index !== indexToRemove));
   };
 
+  const handleDescriptionChange = (e) => {
+    const input = e.target.value;
+    if (input.length <= 100) {
+      setDescription(input);
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -64,15 +72,21 @@ const PostCreatePage = () => {
           />
         </div>
 
-        {/* Description Input */}
-        <div className="mb-4">
-          <label htmlFor="description" className="block text-black font-bold mb-2">
-            Component Description
-          </label>
+         {/* Description Input */}
+         <div className="mb-4">
+          <div className="flex justify-between items-center mb-1">
+            <label htmlFor="description" className="block text-black font-bold">
+              Component Description
+            </label>
+            {/* Character Limit Display */}
+            <span className="text-sm text-black/50">
+              {description.length} / 100 characters
+            </span>
+          </div>
           <textarea 
             id="description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={handleDescriptionChange}
             className="w-full px-3 py-2 border border-black/20 rounded-lg focus:outline-none focus:border-black/50"
             rows="4"
             placeholder="Describe your component's features and usage"
