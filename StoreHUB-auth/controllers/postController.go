@@ -4,81 +4,48 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	
+	"github.com/rishyym0927/StoreHUB-auth/config"
 	"github.com/rishyym0927/StoreHUB-auth/initializers"
 	"github.com/rishyym0927/StoreHUB-auth/models"
 )
 
-// CreatePost creates a new post
-func CreatePost(c *gin.Context) {
-    var body struct {
-        Title         string   `json:"title" binding:"required"`
-        Description   string   `json:"description" binding:"required"`
-        Images        []string `json:"images"`
-        CodeSnippet   string   `json:"codeSnippet"`
-        Framework     string   `json:"framework"`
-        ComponentType string   `json:"componentType"`
+// Helper function to generate a cache key
+func generateCacheKey(prefix string, params ...string) string {
+    key := prefix
+    for _, param := range params {
+        key += ":" + param
     }
+    return key
+}
 
-    if err := c.ShouldBindJSON(&body); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-    user, exists := c.Get("user")
-    if !exists {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
-        return
-    }
-    fmt.Printf("User from context (type assertion): %+v\n", user)
-    currentUser, ok := user.(*models.User)
-    if !ok {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user type"})
-        return
-    }
-    var imagesJSON []byte
-    var err error
-    if len(body.Images) > 0 {
-        imagesJSON, err = json.Marshal(body.Images)
-        if err != nil {
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process images"})
+// GetAllPosts with Redis caching
+func GetAllPosts(c *gin.Context) {
+   
+    cacheKey := generateCacheKey("posts")
+
+    // Try to get from cache first
+    cachedPosts, err := config.RDB.Get(config.Ctx, cacheKey).Result()
+    if err == nil {
+        // Cache hit
+        var processedPosts []gin.H
+        if err := json.Unmarshal([]byte(cachedPosts), &processedPosts); err == nil {
+            c.JSON(http.StatusOK, gin.H{
+                "posts": processedPosts,
+                "count": len(processedPosts),
+                "cached": true,
+            })
+            fmt.Printf("Cache hit for key: %v\n", cacheKey);
             return
         }
     }
-    post := models.Post{
-        UserID:        currentUser.ID,
-        Title:         body.Title,
-        Description:   body.Description,
-        Images:        string(imagesJSON),  // Store as a JSON string
-        CodeSnippet:   body.CodeSnippet,
-        Framework:     body.Framework,
-        ComponentType: body.ComponentType,
-    }
 
-    // Save the post to the database
-    result := initializers.DB.Create(&post)
-    if result.Error != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "error": "Failed to create post", 
-            "details": result.Error.Error(),
-        })
-        return
-    }
-
-    c.JSON(http.StatusOK, gin.H{
-        "message": "Post created successfully", 
-        "post": post,
-    })
-}
-
-
-func GetAllPosts(c *gin.Context) {
+    // Cache miss or error - fetch from database
     var posts []models.Post
     
-    // Optional query parameters for filtering
-    framework := c.Query("framework")
-    componentType := c.Query("componentType")
-
     // Base query with preloading related data
     query := initializers.DB.Preload("User").
         Preload("Likes").
@@ -86,13 +53,7 @@ func GetAllPosts(c *gin.Context) {
         Preload("Comments").
         Preload("Comments.User")
 
-    // Apply filters if provided
-    if framework != "" {
-        query = query.Where("framework = ?", framework)
-    }
-    if componentType != "" {
-        query = query.Where("component_type = ?", componentType)
-    }
+   
 
     // Execute query
     result := query.Find(&posts)
@@ -156,15 +117,35 @@ func GetAllPosts(c *gin.Context) {
         }
     }
 
+    // Cache the processed posts
+    postsJSON, err := json.Marshal(processedPosts)
+    if err == nil {
+        // Cache for 5 minutes
+        config.RDB.Set(config.Ctx, cacheKey, string(postsJSON), 5*time.Minute)
+    }
+
     c.JSON(http.StatusOK, gin.H{
         "posts": processedPosts,
         "count": len(processedPosts),
     })
 }
 
-// GetPostByID retrieves a single post by its ID with detailed information
+// GetPostByID with Redis caching
 func GetPostByID(c *gin.Context) {
     postID := c.Param("id")
+    cacheKey := generateCacheKey("post", postID)
+
+    // Try to get from cache first
+    cachedPost, err := config.RDB.Get(config.Ctx, cacheKey).Result()
+    if err == nil {
+        // Cache hit
+        var postResponse gin.H
+        if err := json.Unmarshal([]byte(cachedPost), &postResponse); err == nil {
+            postResponse["cached"] = true
+            c.JSON(http.StatusOK, postResponse)
+            return
+        }
+    }
 
     var post models.Post
     result := initializers.DB.
@@ -232,5 +213,190 @@ func GetPostByID(c *gin.Context) {
         "createdAt": post.CreatedAt,
     }
 
+    // Cache the post response
+    postJSON, err := json.Marshal(postResponse)
+    if err == nil {
+        // Cache for 5 minutes
+        config.RDB.Set(config.Ctx, cacheKey, string(postJSON), 5*time.Minute)
+    }
+
     c.JSON(http.StatusOK, postResponse)
+}
+
+// Update and Delete methods to invalidate cache
+func UpdatePost(c *gin.Context) {
+    postID := c.Param("id")
+
+    var body struct {
+        Title         string   `json:"title"`
+        Description   string   `json:"description"`
+        Images        []string `json:"images"`
+        CodeSnippet   string   `json:"codeSnippet"`
+        Framework     string   `json:"framework"`
+        ComponentType string   `json:"componentType"`
+    }
+
+    if err := c.ShouldBindJSON(&body); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    var post models.Post
+    result := initializers.DB.First(&post, postID)
+    if result.Error != nil {
+        c.JSON(http.StatusNotFound, gin.H{
+            "error": "Post not found",
+            "details": result.Error.Error(),
+        })
+        return
+    }
+
+    if body.Title != "" {
+        post.Title = body.Title
+    }
+    if body.Description != "" {
+        post.Description = body.Description
+    }
+    if len(body.Images) > 0 {
+        imagesJSON, err := json.Marshal(body.Images)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process images"})
+            return
+        }
+        post.Images = string(imagesJSON)
+    }
+    if body.CodeSnippet != "" {
+        post.CodeSnippet = body.CodeSnippet
+    }
+    if body.Framework != "" {
+        post.Framework = body.Framework
+    }
+    if body.ComponentType != "" {
+        post.ComponentType = body.ComponentType
+    }
+
+    result = initializers.DB.Save(&post)
+    if result.Error != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to update post",
+            "details": result.Error.Error(),
+        })
+        return
+    }
+
+    // Invalidate cache for this specific post and clear all posts caches
+    config.RDB.Del(config.Ctx, 
+        generateCacheKey("post", fmt.Sprintf("%v", postID)),
+        generateCacheKey("posts"),
+    )
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Post updated successfully",
+        "post": post,
+    })
+}
+
+func DeletePost(c *gin.Context) {
+    postID := c.Param("id")
+
+    var post models.Post
+    result := initializers.DB.First(&post, postID)
+    if result.Error != nil {
+        c.JSON(http.StatusNotFound, gin.H{
+            "error": "Post not found",
+            "details": result.Error.Error(),
+        })
+        return
+    }
+
+    result = initializers.DB.Delete(&post)
+    if result.Error != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to delete post",
+            "details": result.Error.Error(),
+        })
+        return
+    }
+
+    // Invalidate cache for this specific post and clear all posts caches
+    config.RDB.Del(config.Ctx, 
+        generateCacheKey("post", fmt.Sprintf("%v", postID)),
+        generateCacheKey("posts"),
+    )
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Post deleted successfully",
+    })
+}
+
+func CreatePost(c *gin.Context) {
+    var body struct {
+        Title         string   `json:"title" binding:"required"`
+        Description   string   `json:"description" binding:"required"`
+        Images        []string `json:"images"`
+        CodeSnippet   string   `json:"codeSnippet"`
+        Framework     string   `json:"framework"`
+        ComponentType string   `json:"componentType"`
+    }
+
+    if err := c.ShouldBindJSON(&body); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    user, exists := c.Get("user")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+        return
+    }
+
+    currentUser, ok := user.(*models.User)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user type"})
+        return
+    }
+
+    var imagesJSON []byte
+    var err error
+    if len(body.Images) > 0 {
+        imagesJSON, err = json.Marshal(body.Images)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process images"})
+            return
+        }
+    }
+
+    post := models.Post{
+        UserID:        currentUser.ID,
+        Title:         body.Title,
+        Description:   body.Description,
+        Images:        string(imagesJSON),  // Store as a JSON string
+        CodeSnippet:   body.CodeSnippet,
+        Framework:     body.Framework,
+        ComponentType: body.ComponentType,
+    }
+
+    // Save the post to the database
+    result := initializers.DB.Create(&post)
+    if result.Error != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to create post", 
+            "details": result.Error.Error(),
+        })
+        return
+    }
+
+    
+
+
+        config.RDB.Del(config.Ctx, "posts")
+       
+
+    
+    fmt.Printf("Deleted cache for keys:\n")
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Post created successfully", 
+        "post": post,
+    })
 }

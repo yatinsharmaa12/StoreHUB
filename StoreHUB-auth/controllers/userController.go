@@ -28,6 +28,17 @@ func GetUserByEmail(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
+//get user by username
+func GetUserByUsername(c *gin.Context) {
+	username := c.Param("username")
+	var user models.User
+	if err := initializers.DB.Preload("Posts").Preload("Likes").Preload("Comments").First(&user, "username = ?", username).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"user": user})
+}
+
 // UploadPhoto uploads a new profile photo
 func UploadPhoto(c *gin.Context) {
 	email := c.Param("email")
@@ -57,6 +68,7 @@ func UploadPhoto(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Profile photo updated successfully"})
 }
 
+
 // DeleteUser deletes a user by email
 func DeleteUser(c *gin.Context) {
 	email := c.Param("email")
@@ -67,30 +79,26 @@ func DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
 
+
+
 // GetCurrentUser fetches the currently authenticated user's details
 func GetCurrentUser(c *gin.Context) {
-	// Retrieve the user from the context (set by RequireAuth middleware)
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	// Type assert the user to the User model
 	authenticatedUser, ok := user.(*models.User)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user details"})
 		return
 	}
-
-	// Preload related data
 	if err := initializers.DB.Preload("Posts").Preload("Likes").Preload("Comments").
 		First(&authenticatedUser, authenticatedUser.ID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user details", "details": err.Error()})
 		return
 	}
-
-	// Return the user details (exclude sensitive fields like password)
 	c.JSON(http.StatusOK, gin.H{
 		"user": gin.H{
 			"id":           authenticatedUser.ID,
