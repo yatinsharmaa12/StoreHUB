@@ -13,6 +13,8 @@ import UnauthorizedPage from './pages/Unauth';
 import PostCreatePage from './pages/CreatePost';
 
 import ProtectedRoute from './components/ProtectedRoute';
+import Sandbox from './pages/Sandbox';
+import Trending from './pages/Trending';
 
 const App = () => {
   return (
@@ -47,6 +49,14 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+             <Route 
+              path="/trending" 
+              element={
+                <ProtectedRoute>
+                  <Trending />
+                </ProtectedRoute>
+              }
+            />
             <Route 
               path="/create" 
               element={
@@ -62,6 +72,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/notfound" element={<NotFoundPage />} />
           <Route path="/unauth" element={<UnauthorizedPage />} />
+          <Route path="/test" element={<Sandbox />} />
           
           {/* Catch-all route for undefined paths */}
           <Route path="*" element={<Navigate to="/notfound" replace />} />
