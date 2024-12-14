@@ -30,7 +30,7 @@ const Navbar = () => {
               <Link to="/trending">
                 <NavItem icon={<Flame />} label="Trending" />
               </Link>
-              <Link to="/stories">
+              <Link to="/sandbox">
                 <NavItem icon={<Book />} label="Stories" />
               </Link>
             </div>

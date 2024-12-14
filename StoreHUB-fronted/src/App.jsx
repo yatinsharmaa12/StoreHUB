@@ -73,7 +73,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/notfound" element={<NotFoundPage />} />
           <Route path="/unauth" element={<UnauthorizedPage />} />
-          <Route path="/test" element={<Sandbox />} />
+          <Route path="/sandbox" element={<Sandbox />} />
           <Route path="/forgot" element={<ForgotPasswordPage />} />
           
           {/* Catch-all route for undefined paths */}

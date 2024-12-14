@@ -83,7 +83,10 @@ func main() {
 	r.GET("/posts/:id", middlewares.RequireAuth, controllers.GetPostByID)
 
 	// Comment routes
-	r.POST("/comments", middlewares.RequireAuth, controllers.CreateComment)
+	r.POST("/comments/:postId", middlewares.RequireAuth, controllers.CreateComment)
+	r.GET("/comments/:postId", middlewares.RequireAuth, controllers.GetPostComments)
+
+
 
 	// Like routes
 	r.POST("/likes", middlewares.RequireAuth, controllers.CreateLike)
