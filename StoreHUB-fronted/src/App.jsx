@@ -14,7 +14,8 @@ import PostCreatePage from './pages/CreatePost';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import Sandbox from './pages/Sandbox';
-import Trending from './pages/Trending';
+import Trending from './pages/Trending'; 
+import ForgotPasswordPage from './pages/ForgotPassword';
 
 const App = () => {
   return (
@@ -73,6 +74,7 @@ const App = () => {
           <Route path="/notfound" element={<NotFoundPage />} />
           <Route path="/unauth" element={<UnauthorizedPage />} />
           <Route path="/test" element={<Sandbox />} />
+          <Route path="/forgot" element={<ForgotPasswordPage />} />
           
           {/* Catch-all route for undefined paths */}
           <Route path="*" element={<Navigate to="/notfound" replace />} />
