@@ -91,6 +91,11 @@ func main() {
 	// Like routes
 	r.POST("/likes", middlewares.RequireAuth, controllers.CreateLike)
 
+
+	// Sandbox routes
+	r.POST("/sandbox", middlewares.RequireAuth, controllers.CreateSanbox)
+	r.GET("/sandbox", middlewares.RequireAuth, controllers.GetAllSandboxes)
+
 	// Run the server
 	initializers.SugarLogger.Info("Server running on port 3000")
 	r.Run(":3000")
