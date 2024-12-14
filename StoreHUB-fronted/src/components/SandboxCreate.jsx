@@ -178,7 +178,7 @@ const SandboxCreate = () => {
       const formData = {
         title: title,
         description: description,
-        elink: `https://codesandbox.io/embed/${sandboxId}`,
+        elink: `https://codesandbox.io/embed/${sandboxId}?view=preview`,
       };
       console.log(formData);
       const response2 = await apiClient.post('/sandbox', formData);

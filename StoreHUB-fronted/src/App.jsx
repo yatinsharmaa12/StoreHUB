@@ -57,6 +57,15 @@ const App = () => {
               }
             />
 
+<Route
+              path="sandbox"
+              element={
+                <ProtectedRoute>
+                  <Sandbox />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/profile"
               element={
