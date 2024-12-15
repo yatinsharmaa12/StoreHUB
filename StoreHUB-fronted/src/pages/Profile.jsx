@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { UserCircle2, Camera, Edit, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import SandboxCard from "../components/SandboxCard";
 import { Link } from "react-router-dom";
 
 const ComponentCard = ({ post, user }) => {
@@ -53,16 +54,18 @@ const ComponentCard = ({ post, user }) => {
 
 const ProfilePage = () => {
   const { user } = useAuth();
-  const {logout}=useAuth();
+  const { logout } = useAuth();
+  const [activeTab, setActiveTab] = useState("posts");
+  console.log(user)
   const handleImageUpload = () => {
     alert("Image upload functionality to be implemented");
   };
 
   return (
-    <div className="flex ">
+    <div className="flex">
       {/* Sidebar */}
-      <div className="w-64 fixed left-0 top-0 h-full bg-white border-r border-black/10 p-6  flex flex-col justify-between items-center  ">
-        <div className="relative mb-6 ">
+      <div className="w-64 fixed left-0 top-0 h-full bg-white border-r border-black/10 p-6 flex flex-col justify-between items-center">
+        <div className="relative mb-6">
           <div className="relative w-32 h-32 mx-auto mb-4">
             <img
               src={user.user.profilePhoto || "/api/placeholder/100/100"}
@@ -87,18 +90,66 @@ const ProfilePage = () => {
             </p>
           </div>
         </div>
-        <button onClick={logout} className="border border-black w-full h-8 rounded-md hover:scale-105 ease-in duration-300">Logout</button>
-       
+        <button
+          onClick={logout}
+          className="border border-black w-full h-8 rounded-md hover:scale-105 ease-in duration-300"
+        >
+          Logout
+        </button>
       </div>
 
       {/* Main Content */}
-      <div className="ml-64 mt-16 p-6">
-        <h3 className="text-2xl font-semibold mb-6">My Posts</h3>
-        <div className="grid grid-cols-3 gap-6">
-          {user.user.posts.map((post, idx) => (
-            <ComponentCard key={idx} post={post} user={user} />
-          ))}
+      <div className="ml-64 mt-16 p-6 w-full">
+        <div className="flex space-x-4 mb-6">
+          <button
+            className={`px-4 py-2 rounded ${
+              activeTab === "posts"
+                ? "bg-black text-white"
+                : "bg-white border border-1 border-black  text-black"
+            }`}
+            onClick={() => setActiveTab("posts")}
+          >
+            Posts
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${
+              activeTab === "sandboxes"
+                ? "bg-black text-white"
+                : "bg-white border border-black/10 text-black"
+            }`}
+            onClick={() => setActiveTab("sandboxes")}
+          >
+            Sandboxes
+          </button>
         </div>
+
+        {activeTab === "posts" && (
+          <div>
+            
+            <div className="grid grid-cols-3 gap-6">
+              {user.user.posts.map((post, idx) => (
+                <ComponentCard key={idx} post={post} user={user} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "sandboxes" && (
+          <div>
+        
+            <div className="flex flex-col gap-12">
+              {user.user.sandbox.map((sandboxEle, idx) => (
+                  <Link
+                  to={`/post/${sandboxEle.id}`} 
+                  key={idx} 
+                  className="block transform transition-transform hover:-translate-y-1"
+                >
+                  <SandboxCard {...sandboxEle} />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
