@@ -3,7 +3,7 @@ import { UserCircle2, Camera, Edit, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import SandboxCard from "../components/SandboxCard";
 import { Link } from "react-router-dom";
-
+import img1 from '../assets/user.png'
 const ComponentCard = ({ post, user }) => {
   return (
     <div className="bg-white border border-black/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
@@ -60,17 +60,20 @@ const ProfilePage = () => {
   const handleImageUpload = () => {
     alert("Image upload functionality to be implemented");
   };
+  if(user.user.profilePhoto==="default-profile.png"){
+    console.log(user.user.profilePhoto)
+  }
 
   return (
     <div className="flex">
       {/* Sidebar */}
-      <div className="w-64 fixed left-0 top-0 h-full bg-white border-r border-black/10 p-6 flex flex-col justify-between items-center">
+      <div className="w-64 fixed py-8 pt-20 left-0 top-0 h-full bg-white border-r border-black/10 p-6 flex flex-col justify-between items-center">
         <div className="relative mb-6">
           <div className="relative w-32 h-32 mx-auto mb-4">
             <img
-              src={user.user.profilePhoto || "/api/placeholder/100/100"}
+              src={user.user.profilePhoto==="default-profile.png"? img1 : user.user.profilePhoto}
               alt="Profile"
-              className="w-full h-full rounded-full object-cover"
+              className="w-[90%] h-[90%] rounded-full object-cover border border-1 object-center object-cover border-black"
             />
             <button
               onClick={handleImageUpload}

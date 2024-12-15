@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { UserCircle2, Code, ExternalLink, Layers, Terminal } from "lucide-react";
-import { Link } from "react-router-dom";
+import { UserCircle2, Code, ExternalLink, Layers, Terminal, PlusCircle } from "lucide-react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import apiClient from '../utils/apiClient'
 import SandboxCard from '../components/SandboxCard';
+import Loading from '../components/Loading';
 
 
 
@@ -10,6 +11,7 @@ const Sandbox = () => {
   const [sandboxData, setSandboxData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,10 +33,7 @@ const Sandbox = () => {
   if (isLoading) {
     return (
       <div className="ml-64 mt-16 flex justify-center items-center h-screen">
-        <div className="flex flex-col items-center">
-          <Code className="w-16 h-16 animate-pulse text-black/60 mb-4" />
-          <p className="text-black/60">Loading sandbox components...</p>
-        </div>
+        <Loading />
       </div>
     );
   }
@@ -70,6 +69,21 @@ const Sandbox = () => {
           </div>
         </div>
       )}
+      <button 
+      onClick={()=>{navigate('/sandbox-create')}}
+      className="fixed bottom-8 right-8 z-50 flex items-center justify-center 
+        bg-black text-white rounded-full 
+        px-6 py-3 shadow-lg 
+        hover:bg-black/90 transition-all duration-300 
+        group"
+    >
+      <PlusCircle
+        className="mr-2 group-hover:rotate-90 transition-transform duration-300" 
+        size={24} 
+        strokeWidth={1.5}
+      />
+      Create Sandbox
+    </button>
     </div>
   )
 }
