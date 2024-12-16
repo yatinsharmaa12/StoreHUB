@@ -1,18 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  Code,
-  Copy,
-  Download,
-  Star,
-  ThumbsUp,
-  ThumbsDown,
-  Share2,
-  GitBranch,
-  UserCircle2,
-  MessageCircle,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Code, Copy, Download, Star, ThumbsUp, ThumbsDown, Share2, GitBranch, UserCircle2, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from "../components/Navbar";
 import apiClient from "../utils/apiClient";
 import { useParams } from "react-router-dom";
@@ -210,16 +197,16 @@ const ComponentDetailPage = () => {
     <>
       <Navbar />
       <div className="container mx-auto px-4 py-8 mt-24">
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
           {/* Image Carousel Section */}
-          <div className="relative">
+          <div className="relative w-full max-w-[570px] mx-auto">
             {componentData?.images?.length > 0 ? (
               <>
-                <div className="rounded-lg overflow-hidden shadow-lg h-[570px] w-[570px]">
+                <div className="rounded-lg overflow-hidden shadow-lg aspect-square">
                   <img
                     src={componentData.images[currentImageIndex]}
                     alt={`Component preview ${currentImageIndex + 1}`}
-                    className="w-full h-96 object-cover"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 {/* Image Navigation */}
@@ -259,8 +246,8 @@ const ComponentDetailPage = () => {
           </div>
 
           {/* Content Section */}
-          <div>
-            <div className="flex justify-between items-center mb-8">
+          <div className="w-full">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
               <div>
                 <h1 className="text-3xl font-bold">{componentData.title}</h1>
                 <div className="flex items-center space-x-4 mt-2 text-black/60">
@@ -278,7 +265,7 @@ const ComponentDetailPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex space-x-2">
+              <div className="flex flex-wrap gap-2">
                 <button className="bg-black text-white px-4 py-2 rounded-lg flex items-center">
                   <Download className="mr-2" size={20} />
                   Download
@@ -290,8 +277,8 @@ const ComponentDetailPage = () => {
               </div>
             </div>
 
-            <div className="border-b border-black/10 mb-6">
-              <nav className="flex space-x-4">
+            <div className="border-b border-black/10 mb-6 overflow-x-auto">
+              <nav className="flex space-x-4 min-w-max">
                 <TabButton tab="overview" label="Overview" />
                 <TabButton tab="code" label="Code" />
                 <TabButton tab="comments" label="Comments" />
@@ -307,3 +294,4 @@ const ComponentDetailPage = () => {
 };
 
 export default ComponentDetailPage;
+
