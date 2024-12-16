@@ -93,8 +93,9 @@ func main() {
 
 
 	// Sandbox routes
-	r.POST("/sandbox", middlewares.RequireAuth, controllers.CreateSanbox)
+	r.POST("/sandbox", middlewares.RequireAuth, controllers.CreateSandbox)
 	r.GET("/sandbox", middlewares.RequireAuth, controllers.GetAllSandboxes)
+	r.GET("/sandbox/:id", middlewares.RequireAuth, controllers.GetSandboxByID)
 
 	// Run the server
 	initializers.SugarLogger.Info("Server running on port 3000")

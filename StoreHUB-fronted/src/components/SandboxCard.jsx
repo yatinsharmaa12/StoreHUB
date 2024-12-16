@@ -5,7 +5,7 @@ import { UserCircle2 } from "lucide-react";
 
 const SandboxCard = (card) => {
     return (
-      <div className="bg-white border group w-full flex flex-row border-black/10 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all h-72 duration-300 ease-in-out w-[90%]">
+      <div className="bg-white border group  flex flex-row border-black/10 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all h-72 duration-300 ease-in-out w-[90%]">
         <div className="w-1/2 relative overflow-hidden">
           <iframe
             src={card.Elink}
