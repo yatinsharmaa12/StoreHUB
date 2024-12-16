@@ -1,8 +1,13 @@
 package main
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 
 	"github.com/rishyym0927/StoreHUB-auth/config"
 	"github.com/rishyym0927/StoreHUB-auth/controllers"
@@ -11,53 +16,52 @@ import (
 )
 
 func init() {
+	// Initialize environment variables, DB connection, etc.
 	initializers.LoadEnvVariables()
 	initializers.ConnectToDB()
 	initializers.SyncDatabase()
 	config.InitRedis()
+
+	// Initialize Zap logger
+	initializers.InitLogger()
+
+	// Initialize Prometheus metrics
+	initializers.InitPrometheus()
 }
 
 func main() {
+	// Example log usage
+	initializers.SugarLogger.Info("Server is starting...")
 
-	//redis basics
-	// client := redis.NewClient(&redis.Options{
-	// 	Addr:     "localhost:6379",
-	// 	Password: "",
-	// 	DB:       0, // use default DB
-	// })
-	// ping, err := client.Ping(context.Background()).Result()
-	// if err != nil {
-	// 	fmt.Println("Error in connecting to redis")
-	// 	fmt.Println(err.Error())
-	// 	return
-	// }
-
-	// fmt.Println("Connected to redis")
-	// fmt.Println(ping)
-
-	// err =client.Set(context.Background(), "name","Elliot", 0).Err()
-	// if err != nil {
-	// 	fmt.Println("Error in setting value")
-	// 	fmt.Println(err.Error())
-	// 	return
-	// }
-	// fmt.Println("Value set successfully")
-	// val, err := client.Get(context.Background(), "name").Result()
-	// if err != nil {
-	// 	fmt.Println("Error in getting value")
-	// 	fmt.Println(err.Error())
-	// 	return
-	// }
-	// fmt.Println("Value is: ", val)
-
+	// Gin setup
 	r := gin.Default()
 
+	// CORS middleware configuration
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	}))
+
+	r.Use(func(c *gin.Context) {
+		// Increment the request counter for the method and endpoint
+		initializers.RequestCounter.WithLabelValues(c.Request.Method, c.FullPath()).Inc()
+		c.Next()
+	})
+
+	// Prometheus /metrics endpoint
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
+	// Example route where requestCounter is incremented
+	r.GET("/", func(c *gin.Context) {
+		// Increment the request counter for this route and method
+		initializers.RequestCounter.WithLabelValues(c.Request.Method, "/").Inc()
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Request allowed",
+			"time":    time.Now(),
+		})
+	})
 
 	// Authentication routes
 	r.POST("/signup", controllers.Signup)
@@ -79,14 +83,20 @@ func main() {
 	r.GET("/posts/:id", middlewares.RequireAuth, controllers.GetPostByID)
 
 	// Comment routes
-	r.POST("/comments", middlewares.RequireAuth, controllers.CreateComment)
-	// r.GET("/posts/:id/comments", middlewares.RequireAuth, controllers.GetComments)
-	// r.DELETE("/comments/:id", middlewares.RequireAuth, controllers.DeleteComment)
+	r.POST("/comments/:postId", middlewares.RequireAuth, controllers.CreateComment)
+	r.GET("/comments/:postId", middlewares.RequireAuth, controllers.GetPostComments)
+
+
 
 	// Like routes
 	r.POST("/likes", middlewares.RequireAuth, controllers.CreateLike)
-	// r.GET("/posts/:id/likes", middlewares.RequireAuth, controllers.GetLikes)
-	// r.DELETE("/likes/:id", middlewares.RequireAuth, controllers.DeleteLike)
 
+
+	// Sandbox routes
+	r.POST("/sandbox", middlewares.RequireAuth, controllers.CreateSanbox)
+	r.GET("/sandbox", middlewares.RequireAuth, controllers.GetAllSandboxes)
+
+	// Run the server
+	initializers.SugarLogger.Info("Server running on port 3000")
 	r.Run(":3000")
 }

@@ -94,7 +94,7 @@ func GetCurrentUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user details"})
 		return
 	}
-	if err := initializers.DB.Preload("Posts").Preload("Likes").Preload("Comments").
+	if err := initializers.DB.Preload("Posts").Preload("Likes").Preload("Comments").Preload("Sandbox").
 		First(&authenticatedUser, authenticatedUser.ID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user details", "details": err.Error()})
 		return
@@ -112,6 +112,7 @@ func GetCurrentUser(c *gin.Context) {
 			"posts":        authenticatedUser.Posts,
 			"likes":        authenticatedUser.Likes,
 			"comments":     authenticatedUser.Comments,
+			"sandbox":      authenticatedUser.Sandbox,
 		},
 	})
 }

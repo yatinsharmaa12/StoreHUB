@@ -36,14 +36,14 @@ const Sidebar = () => {
     };
   
     return (
-      <div className="w-64 bg-white border-r border-black/10 h-screen fixed left-0 top-16 p-4 overflow-y-auto">
+      <div className="w-64 bg-white border-r border-black/10 h-screen fixed left-0 top-16 p-4 overflow-y-auto items-center mt-4">
         <div className="flex items-center mb-4">
           <Filter className="mr-2 text-black/60" />
-          <h2 className="text-lg font-semibold">Filters</h2>
+          <h2 className="text-lg font-semibold">Sort & Filter</h2>
         </div>
         {filterSections.map((section, idx) => (
           <div key={idx} className="mb-4">
-            <h3 className="font-medium text-black/70 mb-2">{section.title}</h3>
+            <h3 className=" text-black/70 mb-2 font-semibold">{section.title}</h3>
             <div className="space-y-2">
               {section.options.map((option, optIdx) => (
                 <FilterOption 
@@ -62,7 +62,7 @@ const Sidebar = () => {
   
   const FilterOption = ({ label, isSelected, onToggle }) => (
     <div 
-      className={`flex items-center space-x-2 cursor-pointer ${
+      className={`flex items-center space-x-2 cursor-pointer hover:scale-105 duration-200 ${
         isSelected ? 'text-black' : 'text-black/60'
       }`}
       onClick={onToggle}

@@ -18,4 +18,5 @@ type User struct {
 	Posts        []Post    `gorm:"constraint:OnDelete:CASCADE;"` // Relation to Posts
 	Likes        []Like    `gorm:"constraint:OnDelete:CASCADE;"` // Relation to Likes
 	Comments     []Comment `gorm:"constraint:OnDelete:CASCADE;"` // Relation to Comments
+	Sandbox      []Sandbox `gorm:"constraint:OnDelete:CASCADE;"` // Relation to Sandbox
 }
