@@ -9,6 +9,37 @@ const PostCreatePage = () => {
   const [type, setType] = useState('');
   const [codeSnippet, setCodeSnippet] = useState('');
   const [images, setImages] = useState([]);
+  const [errors, setErrors] = useState({});
+
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!title ||  title.length < 5 ) {
+      newErrors.title =
+        "Title is required and must be more than 5 characters.";
+    }
+    if (!description || ( description.length < 20) ) {
+      newErrors.description =
+        "Description is required and must be more than 20 characters.";
+    }
+    if (!framework) {
+      newErrors.framework = "Please select a framework.";
+    }
+
+    if (!type) {
+      newErrors.type = "Please select a component type.";
+    }
+
+    if (!codeSnippet || codeSnippet.length < 20) {
+      newErrors.codeSnippet =
+        "Code snippet is required and must be at least 20 characters.";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0; // Return true if no errors
+  };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -20,8 +51,20 @@ const PostCreatePage = () => {
     setImages(prevImages => prevImages.filter((_, index) => index !== indexToRemove));
   };
 
+  const handleDescriptionChange = (e) => {
+    const input = e.target.value;
+    if (input.length <= 100) {
+      setDescription(input);
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if(!validateForm()) {
+      return;
+    }
     
     try {
       const postData = { title, description, framework, type, codeSnippet, images };
@@ -58,26 +101,41 @@ const PostCreatePage = () => {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-black/20 rounded-lg focus:outline-none focus:border-black/50"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
+              errors.title ? "border-red-500" : "border-black/20"
+            }`}
             placeholder="Enter component title"
             required 
+            
           />
+          {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
         </div>
 
         {/* Description Input */}
         <div className="mb-4">
-          <label htmlFor="description" className="block text-black font-bold mb-2">
-            Component Description
-          </label>
+          <div className="flex justify-between items-center mb-1">
+            <label htmlFor="description" className="block text-black font-bold">
+              Component Description
+            </label>
+            {/* Character Limit Display */}
+            <span className="text-sm text-black/50">
+              {description.length} / 100 characters
+            </span>
+          </div>
           <textarea 
             id="description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-3 py-2 border border-black/20 rounded-lg focus:outline-none focus:border-black/50"
+            onChange={handleDescriptionChange}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
+              errors.description ? "border-red-500" : "border-black/20"
+            }`}
             rows="4"
             placeholder="Describe your component's features and usage"
             required 
           />
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+          )}
         </div>
 
         {/* Framework and Type */}
@@ -90,7 +148,9 @@ const PostCreatePage = () => {
               id="framework"
               value={framework}
               onChange={(e) => setFramework(e.target.value)}
-              className="w-full px-3 py-2 border border-black/20 rounded-lg focus:outline-none focus:border-black/50"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
+                errors.framework ? "border-red-500" : "border-black/20"
+              }`}
               required
             >
               <option value="">Select Framework</option>
@@ -99,6 +159,9 @@ const PostCreatePage = () => {
               <option value="Angular">Angular</option>
               <option value="Svelte">Svelte</option>
             </select>
+            {errors.framework && (
+              <p className="text-red-500 text-sm mt-1">{errors.framework}</p>
+            )}
           </div>
           <div>
             <label htmlFor="type" className="block text-black font-bold mb-2">
@@ -108,7 +171,9 @@ const PostCreatePage = () => {
               id="type"
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full px-3 py-2 border border-black/20 rounded-lg focus:outline-none focus:border-black/50"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
+                errors.type ? "border-red-500" : "border-black/20"
+              }`}
               required
             >
               <option value="">Select Type</option>
@@ -117,6 +182,9 @@ const PostCreatePage = () => {
               <option value="Card">Card</option>
               <option value="Modal">Modal</option>
             </select>
+            {errors.type && (
+              <p className="text-red-500 text-sm mt-1">{errors.type}</p>
+            )}
           </div>
         </div>
 
@@ -129,11 +197,16 @@ const PostCreatePage = () => {
             id="codeSnippet"
             value={codeSnippet}
             onChange={(e) => setCodeSnippet(e.target.value)}
-            className="w-full px-3 py-2 border border-black/20 rounded-lg focus:outline-none focus:border-black/50 font-mono text-sm"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none font-mono text-sm ${
+              errors.codeSnippet ? "border-red-500" : "border-black/20"
+            }`}
             rows="6"
             placeholder="Paste your component's code snippet"
             required 
           />
+          {errors.codeSnippet && (
+            <p className="text-red-500 text-sm mt-1">{errors.codeSnippet}</p>
+          )}
         </div>
 
         {/* Image Upload */}
