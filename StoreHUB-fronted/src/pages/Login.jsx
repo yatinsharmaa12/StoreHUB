@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, User } from 'lucide-react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
@@ -80,12 +80,12 @@ const LoginPage = () => {
           </div>
 
           <div className="flex justify-end">
-            <a
-              href="/forgot-password"
+            <Link
+              to="/forgot"
               className="text-black/60 hover:text-black transition-colors text-sm"
             >
               Forgot Password?
-            </a>
+            </Link>
           </div>
 
           <button

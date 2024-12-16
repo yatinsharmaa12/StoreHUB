@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Code,
   Copy,
@@ -16,18 +16,23 @@ import {
 import Navbar from "../components/Navbar";
 import apiClient from "../utils/apiClient";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const ComponentDetailPage = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [copied, setCopied] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [newComment, setNewComment] = useState(""); // Added state for new comment input
   const { id } = useParams();
   const [componentData, setComponentData] = useState(null);
+  const { user } = useAuth();
+  console.log(user);
 
   useEffect(() => {
     const fetchComponentData = async () => {
       try {
         const response = await apiClient.get(`/posts/${id}`);
+        console.log("response", response);
         setComponentData(response.data);
       } catch (error) {
         console.error("Error fetching component data:", error);
@@ -35,6 +40,17 @@ const ComponentDetailPage = () => {
     };
     fetchComponentData();
   }, [id]);
+
+  const [commentData, setCommentData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await apiClient.get(`/comments/${id}`);
+      setCommentData(response.data);
+      console.log("comments", response.data);
+    };
+    fetchData();
+  }, [newComment]);
 
   // Show loading state if data is not yet fetched
   if (!componentData) return <div>Loading...</div>;
@@ -52,6 +68,39 @@ const ComponentDetailPage = () => {
     });
   };
 
+  const handlePostComment = async () => {
+    if (newComment.trim().length > 0) {
+      const commentData = {
+        content: newComment,
+      };
+
+      try {
+        // Send the comment to the server
+        const response = await apiClient.post(`/comments/${id}`, commentData);
+
+        if (response.status === 200) {
+          // Comment successfully posted, no further action needed
+          setNewComment(""); // Clear the input
+        } else {
+          // Handle unsuccessful post request
+          alert("Failed to post the comment. Please try again.");
+        }
+      } catch (error) {
+        // Handle error during the request
+        console.error("Error posting comment:", error);
+        alert(
+          "An error occurred while posting your comment. Please try again."
+        );
+        setComponentData((prevData) => ({
+          ...prevData,
+          comments: prevData.comments.slice(0, -1), // Remove the optimistic comment
+        }));
+      }
+    } else {
+      alert("Please enter a comment.");
+    }
+  };
+
   const TabButton = ({ tab, label }) => (
     <button
       className={`px-4 py-2 border-b-2 transition-colors ${
@@ -64,7 +113,7 @@ const ComponentDetailPage = () => {
       {label}
     </button>
   );
-  console.log(componentData);
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "overview":
@@ -103,8 +152,12 @@ const ComponentDetailPage = () => {
               <code className="text-sm">{componentData.codeSnippet}</code>
             </pre>
             <button
-              // onClick={copyToClipboard}
               className="absolute top-2 right-2 bg-black/10 p-2 rounded hover:bg-black/20 transition-colors"
+              onClick={() => {
+                navigator.clipboard.writeText(componentData.codeSnippet);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
             >
               {copied ? "Copied!" : <Copy size={20} />}
             </button>
@@ -113,25 +166,36 @@ const ComponentDetailPage = () => {
       case "comments":
         return (
           <div className="space-y-4 h-80 overflow-y-scroll">
-            {componentData.comments.map((comment, index) => (
-              <div key={index} className="border-b border-black/10 pb-4">
-                <div className="flex items-center mb-2">
-                  <UserCircle2 className="mr-2" size={24} />
-                  <div>
-                    <p className="font-semibold">{comment.user}</p>
-                    <p className="text-black/60 text-sm">{comment.date}</p>
+            {commentData?.comments?.length ? (
+              commentData.comments.map((comment, index) => (
+                <div key={index} className="border-b border-black/10 pb-4">
+                  <div className="flex items-center mb-2">
+                    <UserCircle2 className="mr-2" size={24} />
+                    <div>
+                      <p className="font-semibold">{comment.User.Username}</p>
+                      <p className="text-black/60 text-sm">
+                        {new Date(comment.CreatedAt).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
+                  <p>{comment.Content}</p>
                 </div>
-                <p>{comment.text}</p>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>No comments yet...</p>
+            )}
             <div className="flex items-center space-x-2">
               <input
                 type="text"
                 placeholder="Add a comment..."
                 className="flex-grow p-2 border border-black/20 rounded-lg"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
               />
-              <button className="bg-black text-white px-4 py-2 rounded-lg">
+              <button
+                className="bg-black text-white px-4 py-2 rounded-lg"
+                onClick={handlePostComment}
+              >
                 Post
               </button>
             </div>
@@ -147,7 +211,6 @@ const ComponentDetailPage = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-8 mt-24">
         <div className="grid grid-cols-2 gap-8">
-          {/* Image Carousel Section */}
           {/* Image Carousel Section */}
           <div className="relative">
             {componentData?.images?.length > 0 ? (

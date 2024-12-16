@@ -358,12 +358,16 @@ func CreatePost(c *gin.Context) {
 
     var imagesJSON []byte
     var err error
-    if len(body.Images) > 0 {
-        imagesJSON, err = json.Marshal(body.Images)
-        if err != nil {
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process images"})
-            return
-        }
+    // In case of no image, a default "no image" image is added 
+    // to the post. This image will be removed in case the user
+    // uploads an image while updating the post.
+    if len(body.Images) == 0 {
+        body.Images = []string{"../assets/default_image.jpg"}
+    }
+    imagesJSON, err = json.Marshal(body.Images)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process images"})
+        return
     }
 
     post := models.Post{
@@ -386,13 +390,7 @@ func CreatePost(c *gin.Context) {
         return
     }
 
-    
-
-
-        config.RDB.Del(config.Ctx, "posts")
-       
-
-    
+    config.RDB.Del(config.Ctx, "posts")
     fmt.Printf("Deleted cache for keys:\n")
 
     c.JSON(http.StatusOK, gin.H{

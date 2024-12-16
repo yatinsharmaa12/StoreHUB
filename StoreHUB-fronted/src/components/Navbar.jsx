@@ -30,8 +30,8 @@ const Navbar = () => {
               <Link to="/trending">
                 <NavItem icon={<Flame />} label="Trending" />
               </Link>
-              <Link to="/stories">
-                <NavItem icon={<Book />} label="Stories" />
+              <Link to="/sandbox">
+                <NavItem icon={<Book />} label="Sandbox" />
               </Link>
             </div>
           </div>

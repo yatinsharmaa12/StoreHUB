@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, User, Mail, KeyRound, UserPlus } from 'lucide-react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import apiClient from '../utils/apiClient';
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -172,7 +172,7 @@ const SignupPage = () => {
               Already have an account? 
               <button 
                 type="button"
-                onClick={() => console.log("Switch to Login")}
+                onClick={() => navigate('/login')}
                 className="text-black font-semibold hover:underline"
               >
                 Login
