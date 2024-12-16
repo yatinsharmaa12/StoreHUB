@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import { Lock, User, Mail, KeyRound, UserPlus } from 'lucide-react';
-import axios from 'axios';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../utils/apiClient';
+
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -13,31 +13,57 @@ const SignupPage = () => {
     confirmPassword: ''
   });
 
-  const navigate = useNavigate();
-
+  const [formErrors, setFormErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigate = useNavigate();
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value
     }));
+    setFormErrors((prevState) => ({
+      ...prevState,
+      [name]: ''
+    }));
+  };
+
+  const validateForm = () => {
+    const errors = {};
+
+    // Required field validations
+    if (!formData.firstName.trim()) errors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) errors.lastName = 'Last name is required';
+    if (!formData.username.trim()) errors.username = 'Username is required';
+    else if (formData.username.length < 3) errors.username = 'Username must be at least 3 characters long';
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) errors.email = 'Email is required';
+    else if (!emailRegex.test(formData.email)) errors.email = 'Enter a valid email address';
+
+    // Password validations
+    if (!formData.password) errors.password = 'Password is required';
+    else if (formData.password.length < 8) errors.password = 'Password must be at least 8 characters long';
+
+    if (!formData.confirmPassword) errors.confirmPassword = 'Confirm your password';
+    else if (formData.password !== formData.confirmPassword) errors.confirmPassword = 'Passwords do not match';
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      setErrorMessage("Passwords do not match");
-      return;
-    }
+    if (!validateForm()) return;
 
     setErrorMessage('');
     setIsLoading(true);
 
-    // Prepare the request body
     const requestBody = {
       first_name: formData.firstName,
       last_name: formData.lastName,
@@ -47,24 +73,17 @@ const SignupPage = () => {
     };
 
     try {
-      // Send POST request to backend API
-      
       const response = await apiClient.post('/signup', requestBody);
 
       if (response.status === 200) {
         console.log('User created successfully');
-        // Optionally, redirect the user to login or home page
-        // e.g., history.push('/login');
         navigate('/login');
-        
       }
     } catch (error) {
       if (error.response) {
-        // Backend responded with an error
-        setErrorMessage(error.response.data.error || "An error occurred. Please try again.");
+        setErrorMessage(error.response.data.error || 'An error occurred. Please try again.');
       } else {
-        // Network or other error
-        setErrorMessage("Network error. Please try again later.");
+        setErrorMessage('Network error. Please try again later.');
       }
     } finally {
       setIsLoading(false);
@@ -79,7 +98,6 @@ const SignupPage = () => {
           <p className="text-black/60 mt-2">Create your account to get started.</p>
         </div>
 
-        {/* Display error message if there is one */}
         {errorMessage && (
           <div className="text-red-500 text-center mb-4">
             <p>{errorMessage}</p>
@@ -94,9 +112,10 @@ const SignupPage = () => {
               placeholder="First Name"
               value={formData.firstName}
               onChange={handleInputChange}
-              className="w-full p-3 pl-10 border border-black/20 rounded-lg focus:outline-none focus:border-black"
+              className={`w-full p-3 pl-10 border ${formErrors.firstName ? 'border-red-500' : 'border-black/20'} rounded-lg focus:outline-none focus:border-black`}
             />
             <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50" size={20} />
+            {formErrors.firstName && <p className="text-red-500 text-sm mt-1">{formErrors.firstName}</p>}
           </div>
 
           <div className="relative">
@@ -106,9 +125,9 @@ const SignupPage = () => {
               placeholder="Last Name"
               value={formData.lastName}
               onChange={handleInputChange}
-              className="w-full p-3 pl-10 border border-black/20 rounded-lg focus:outline-none focus:border-black"
+              className={`w-full p-3 pl-10 border ${formErrors.lastName ? 'border-red-500' : 'border-black/20'} rounded-lg focus:outline-none focus:border-black`}
             />
-            
+            {formErrors.lastName && <p className="text-red-500 text-sm mt-1">{formErrors.lastName}</p>}
           </div>
 
           <div className="relative">
@@ -118,9 +137,10 @@ const SignupPage = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full p-3 pl-10 border border-black/20 rounded-lg focus:outline-none focus:border-black"
+              className={`w-full p-3 pl-10 border ${formErrors.email ? 'border-red-500' : 'border-black/20'} rounded-lg focus:outline-none focus:border-black`}
             />
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50" size={20} />
+            {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
           </div>
 
           <div className="relative">
@@ -130,9 +150,10 @@ const SignupPage = () => {
               placeholder="Username"
               value={formData.username}
               onChange={handleInputChange}
-              className="w-full p-3 pl-10 border border-black/20 rounded-lg focus:outline-none focus:border-black"
+              className={`w-full p-3 pl-10 border ${formErrors.username ? 'border-red-500' : 'border-black/20'} rounded-lg focus:outline-none focus:border-black`}
             />
             <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50" size={20} />
+            {formErrors.username && <p className="text-red-500 text-sm mt-1">{formErrors.username}</p>}
           </div>
 
           <div className="relative">
@@ -142,9 +163,10 @@ const SignupPage = () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full p-3 pl-10 border border-black/20 rounded-lg focus:outline-none focus:border-black"
+              className={`w-full p-3 pl-10 border ${formErrors.password ? 'border-red-500' : 'border-black/20'} rounded-lg focus:outline-none focus:border-black`}
             />
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50" size={20} />
+            {formErrors.password && <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>}
           </div>
 
           <div className="relative">
@@ -154,9 +176,10 @@ const SignupPage = () => {
               placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              className="w-full p-3 pl-10 border border-black/20 rounded-lg focus:outline-none focus:border-black"
+              className={`w-full p-3 pl-10 border ${formErrors.confirmPassword ? 'border-red-500' : 'border-black/20'} rounded-lg focus:outline-none focus:border-black`}
             />
             <KeyRound className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50" size={20} />
+            {formErrors.confirmPassword && <p className="text-red-500 text-sm mt-1">{formErrors.confirmPassword}</p>}
           </div>
 
           <button 

@@ -1,38 +1,77 @@
 import React, { useState } from 'react';
 import { Lock, User } from 'lucide-react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
-  const navigate = useNavigate();
-
+  const [formErrors, setFormErrors] = useState({
+    email: '',
+    password: '',
+  });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
+    }));
+
+    // Reset field-specific errors
+    setFormErrors((prevState) => ({
+      ...prevState,
+      [name]: '',
     }));
   };
-  const {login} = useAuth()
+
+  const validateForm = () => {
+    let isValid = true;
+    const errors = {};
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      errors.email = 'Email is required';
+      isValid = false;
+    } else if (!emailRegex.test(formData.email)) {
+      errors.email = 'Enter a valid email address';
+      isValid = false;
+    }
+
+    // Password validation
+    if (!formData.password) {
+      errors.password = 'Password is required';
+      isValid = false;
+    } else if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters long';
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null); // Reset error on new submission
+    setError(null); // Reset global error
 
+    if (!validateForm()) return;
+
+    setIsLoading(true);
     try {
-     const response =  await login(formData);
+      await login(formData);
       navigate('/');
-     
     } catch (err) {
       console.error('Login failed:', err);
-      setError('Network error, please try again');
+      setError('Invalid Credentials, Please try again');
     } finally {
       setIsLoading(false);
     }
@@ -60,10 +99,18 @@ const LoginPage = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full p-3 pl-10 border border-black/20 rounded-lg focus:outline-none focus:border-black"
+              className={`w-full p-3 pl-10 border ${
+                formErrors.email ? 'border-red-500' : 'border-black/20'
+              } rounded-lg focus:outline-none focus:border-black`}
               required
             />
-            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50" size={20} />
+            <User
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50"
+              size={20}
+            />
+            {formErrors.email && (
+              <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+            )}
           </div>
 
           <div className="relative">
@@ -73,10 +120,18 @@ const LoginPage = () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full p-3 pl-10 border border-black/20 rounded-lg focus:outline-none focus:border-black"
+              className={`w-full p-3 pl-10 border ${
+                formErrors.password ? 'border-red-500' : 'border-black/20'
+              } rounded-lg focus:outline-none focus:border-black`}
               required
             />
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50" size={20} />
+            <Lock
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/50"
+              size={20}
+            />
+            {formErrors.password && (
+              <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>
+            )}
           </div>
 
           <div className="flex justify-end">
