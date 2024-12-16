@@ -53,7 +53,7 @@ const Sandbox = () => {
     <div className="mx-24 mt-16 p-6 flex flex-col gap-8">
       {sandboxData.map((component, idx) => (
         <Link
-          to={`/post/${component.id}`} 
+          to={`/sandbox/${component.ID}`} 
           key={idx} 
           className="block transform transition-transform hover:-translate-y-1"
         >

@@ -23,6 +23,7 @@ import Trending from "./pages/Trending";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import SandboxCreate from "./components/SandboxCreate";
 import Sandbox from "./pages/Sandbox";
+import SandboxDetail from "./pages/SandboxDetail";
 
 const App = () => {
   return (
@@ -48,7 +49,7 @@ const App = () => {
               }
             />
 
-                 <Route
+            <Route
               path="sandbox-create"
               element={
                 <ProtectedRoute>
@@ -57,7 +58,7 @@ const App = () => {
               }
             />
 
-<Route
+            <Route
               path="sandbox"
               element={
                 <ProtectedRoute>
@@ -82,12 +83,21 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-       
+
             <Route
               path="/create"
               element={
                 <ProtectedRoute>
                   <PostCreatePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/sandbox/:id"
+              element={
+                <ProtectedRoute>
+                  <SandboxDetail />
                 </ProtectedRoute>
               }
             />
@@ -98,7 +108,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/notfound" element={<NotFoundPage />} />
           <Route path="/unauth" element={<UnauthorizedPage />} />
-              <Route path="/sandbox" element={<Sandbox />} />
+          <Route path="/sandbox" element={<Sandbox />} />
           <Route path="/forgot" element={<ForgotPasswordPage />} />
 
           {/* Catch-all route for undefined paths */}
