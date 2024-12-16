@@ -6,7 +6,7 @@ const PostCreatePage = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [framework, setFramework] = useState('');
-  const [type, setType] = useState('');
+  const [componentType, setComponentType] = useState('');
   const [codeSnippet, setCodeSnippet] = useState('');
   const [images, setImages] = useState([]);
   const [errors, setErrors] = useState({});
@@ -27,8 +27,8 @@ const PostCreatePage = () => {
       newErrors.framework = "Please select a framework.";
     }
 
-    if (!type) {
-      newErrors.type = "Please select a component type.";
+    if (!componentType) {
+      newErrors.componentType = "Please select a component type.";
     }
 
     if (!codeSnippet || codeSnippet.length < 20) {
@@ -67,7 +67,7 @@ const PostCreatePage = () => {
     }
     
     try {
-      const postData = { title, description, framework, type, codeSnippet, images };
+      const postData = { title, description, framework, componentType, codeSnippet, images };
       
       const response = await apiClient.post('/posts', postData);
       console.log('Post submitted:', response.data);
@@ -76,7 +76,7 @@ const PostCreatePage = () => {
       setTitle('');
       setDescription('');
       setFramework('');
-      setType('');
+      setComponentType('');
       setCodeSnippet('');
       setImages([]);
       alert('Post created successfully!');
@@ -169,8 +169,8 @@ const PostCreatePage = () => {
             </label>
             <select
               id="type"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
+              value={componentType}
+              onChange={(e) => setComponentType(e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
                 errors.type ? "border-red-500" : "border-black/20"
               }`}
