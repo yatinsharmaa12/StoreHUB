@@ -1,0 +1,34 @@
+version: 2
+updates:
+
+  - package-ecosystem: "npm"
+    directory: "/StoreHUB-frontend"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    open-pull-requests-limit: 5
+
+
+  - package-ecosystem: "gomod"
+    directory: "/StoreHUB-auth"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    open-pull-requests-limit: 5
+
+ 
+  - package-ecosystem: "npm"
+    directory: "/StoreHUB-frontend"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "security"
+
+  - package-ecosystem: "gomod"
+    directory: "/StoreHUB-auth"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "security"
