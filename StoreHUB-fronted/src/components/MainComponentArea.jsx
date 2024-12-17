@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const ComponentCard = (card) => {
   console.log(card);
   return (
-    <div className="bg-white border border-black/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+    <div className=" bg-white border border-black/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
       <div className="h-48 overflow-hidden">
         <img
           src={card.image || "/api/placeholder/400/300"}
@@ -49,7 +49,7 @@ const ComponentCard = (card) => {
 
 const MainComponentArea = ({ components }) => {
   return (
-    <div className="ml-64 mt-16 p-6 grid grid-cols-3 gap-6">
+    <div className="ml-64 mt-16 p-6 grid grid-cols-3 gap-6 ">
       {components.map((component, idx) => (
         <Link to={`/post/${component.id}`}>
           <ComponentCard key={idx} {...component} />

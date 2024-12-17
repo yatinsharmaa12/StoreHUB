@@ -15,7 +15,7 @@
 ## 🛠 Tech Stack
 
 | Technology | Purpose | Version |
-|-----------|---------|---------|
+|------------|---------|---------|
 | React | Frontend Framework | 18.x |
 | Golang | Backend Services | 1.20+ |
 | MySQL | Database Management | 8.0+ |
@@ -73,9 +73,11 @@ go run main.go
 ```
 
 ### 4. Database Configuration
-1. Create a MySQL database
-2. Update `backend/config.yaml` with your database credentials
-3. Run database migrations to set up schema
+1. Create a MySQL database.
+2. Update `backend/config.yaml` with your database credentials.
+3. Run database migrations to set up schema.
+
+---
 
 ## 🔐 Environment Variables
 
@@ -98,6 +100,53 @@ server:
   port: 8080
   jwt_secret: your_jwt_secret
 ```
+
+### Email Setup
+
+To enable email functionality (for sending emails like post creation notifications), you need to set up an email service using SMTP (e.g., Gmail). Follow these steps:
+
+1. **Gmail SMTP Configuration**:  
+   - You need to create a Google App Password if you're using Gmail with 2-factor authentication enabled.
+   - Go to your Google account -> Security -> App Passwords -> Create a new app password for your application.
+   - Add the following environment variables to your `.env` file:
+     - `EMAIL`: Your Gmail address (e.g., `your-email@gmail.com`).
+     - `PASSWORD`: The app password generated in the previous step.
+
+2. **Other Email Providers**:  
+   If you're using a different email provider (e.g., SendGrid, Mailgun), replace the SMTP configuration in the code accordingly and set up the relevant credentials.
+
+---
+
+### Sample `.env` File
+
+Below is an example of what your `.env` file should look like. Copy this content into your `.env` file and replace the placeholders with your actual credentials.
+
+```env
+# Server Port
+PORT=3000  # The port your backend server will run on.
+
+# Production Database URL
+DB_PRODUCTION="mysql://<username>:<password>@<host>:<port>/<database>?ssl-mode=REQUIRED"  
+# Replace `<username>`, `<password>`, `<host>`, `<port>`, and `<database>` with your production database credentials.
+
+# JWT Secret Key
+JWTSECRET=<your_jwt_secret>  
+# Secret key used for signing JSON Web Tokens. Replace `<your_jwt_secret>` with your key.
+
+# Environment
+ENV=<environment_name>  
+# Define the environment, e.g., "production" or "development".
+
+# Development Database URL
+DB_DEVELOPMENT="<username>:<password>@tcp(<host>:<port>)/<database>?charset=utf8mb4&parseTime=True&loc=Local"  
+# Replace `<username>`, `<password>`, `<host>`, `<port>`, and `<database>` with your development database credentials.
+
+# Email Configuration (for sending emails)
+EMAIL=<your_email_address>  # Your email address (e.g., your-email@gmail.com).
+PASSWORD=<your_email_app_password>  # Your email app password (for Gmail, generate one from your Google account).
+```
+
+---
 
 ## 🤝 Contributing
 
@@ -147,3 +196,4 @@ If you encounter any issues or have questions:
 ---
 
 **Happy Coding! 👩‍💻👨‍💻**
+

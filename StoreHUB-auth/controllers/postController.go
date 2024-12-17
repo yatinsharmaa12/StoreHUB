@@ -390,6 +390,12 @@ func CreatePost(c *gin.Context) {
         return
     }
 
+    err = config.SendPostCreationEmail(currentUser.Email, currentUser.FirstName, post)
+    if err != nil {
+        fmt.Printf("Error sending email: %v\n", err)
+    }
+
+
     config.RDB.Del(config.Ctx, "posts")
     fmt.Printf("Deleted cache for keys:\n")
 
