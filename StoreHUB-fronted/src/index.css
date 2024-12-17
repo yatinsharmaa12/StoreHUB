@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Hide scrollbar for Webkit browsers */
+::-webkit-scrollbar {
+    width: 0; /* Set width to 0 */
+    height: 0; /* Set height to 0 for horizontal scrollbars */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    display: none; /* Hide scrollbar thumb */
+  }
+  
+  ::-webkit-scrollbar-track {
+    display: none; /* Hide scrollbar track */
+  }
+  

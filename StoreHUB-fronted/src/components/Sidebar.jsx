@@ -36,7 +36,7 @@ const Sidebar = () => {
     };
   
     return (
-      <div className="w-72 bg-white border-r border-black/10 h-screen fixed left-0 top-16 p-6 overflow-y-auto items-center mt-4 shadow-lg">
+      <div className="w-60 bg-white border-r border-black/10 h-screen fixed left-0 top-16 p-6 overflow-y-auto items-center mt-4 pb-16 shadow-lg">
         <div className="flex items-center mb-8 bg-black text-white p-3 rounded-lg">
           <Filter className="mr-2" />
           <h2 className="text-lg font-semibold">Sort & Filter</h2>
