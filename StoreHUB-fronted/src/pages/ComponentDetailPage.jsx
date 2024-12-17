@@ -1,5 +1,20 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Code, Copy, Download, Star, ThumbsUp, ThumbsDown, Share2, GitBranch, UserCircle2, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  Code,
+  Copy,
+  Download,
+  Star,
+  ThumbsUp,
+  ThumbsDown,
+  Share2,
+  GitBranch,
+  UserCircle2,
+  MessageCircle,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  X,
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import apiClient from "../utils/apiClient";
 import { useParams } from "react-router-dom";
@@ -9,17 +24,17 @@ const ComponentDetailPage = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [copied, setCopied] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [newComment, setNewComment] = useState(""); // Added state for new comment input
-  const { id } = useParams();
+  const [newComment, setNewComment] = useState("");
   const [componentData, setComponentData] = useState(null);
+  const [commentData, setCommentData] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { id } = useParams();
   const { user } = useAuth();
-  console.log(user);
-
   useEffect(() => {
+    // Fetch component details
     const fetchComponentData = async () => {
       try {
         const response = await apiClient.get(`/posts/${id}`);
-        console.log("response", response);
         setComponentData(response.data);
       } catch (error) {
         console.error("Error fetching component data:", error);
@@ -28,19 +43,20 @@ const ComponentDetailPage = () => {
     fetchComponentData();
   }, [id]);
 
-  const [commentData, setCommentData] = useState(null);
-
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await apiClient.get(`/comments/${id}`);
-      setCommentData(response.data);
-      console.log("comments", response.data);
+    // Fetch comments
+    const fetchComments = async () => {
+      try {
+        const response = await apiClient.get(`/comments/${id}`);
+        setCommentData(response.data);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
     };
-    fetchData();
+    fetchComments();
   }, [newComment]);
 
-  // Show loading state if data is not yet fetched
-  if (!componentData) return <div>Loading...</div>;
+  if (!componentData) return <div className="flex justify-center items-center h-screen">Loading...</div>;
 
   const handleImageChange = (direction) => {
     if (!componentData?.images?.length) return;
@@ -56,46 +72,28 @@ const ComponentDetailPage = () => {
   };
 
   const handlePostComment = async () => {
-    if (newComment.trim().length > 0) {
-      const commentData = {
-        content: newComment,
-      };
-
+    if (newComment.trim()) {
       try {
-        // Send the comment to the server
-        const response = await apiClient.post(`/comments/${id}`, commentData);
-
-        if (response.status === 200) {
-          // Comment successfully posted, no further action needed
-          setNewComment(""); // Clear the input
-        } else {
-          // Handle unsuccessful post request
-          alert("Failed to post the comment. Please try again.");
-        }
+        await apiClient.post(`/comments/${id}`, { content: newComment });
+        setNewComment("");
       } catch (error) {
-        // Handle error during the request
         console.error("Error posting comment:", error);
-        alert(
-          "An error occurred while posting your comment. Please try again."
-        );
-        setComponentData((prevData) => ({
-          ...prevData,
-          comments: prevData.comments.slice(0, -1), // Remove the optimistic comment
-        }));
+        alert("Failed to post comment. Try again.");
       }
-    } else {
-      alert("Please enter a comment.");
     }
   };
 
   const TabButton = ({ tab, label }) => (
     <button
-      className={`px-4 py-2 border-b-2 transition-colors ${
+      className={`px-4 py-2 text-sm md:text-base border-b-2 transition-colors ${
         activeTab === tab
           ? "border-black text-black"
           : "border-transparent text-black/60 hover:text-black"
       }`}
-      onClick={() => setActiveTab(tab)}
+      onClick={() => {
+        setActiveTab(tab);
+        setIsMobileMenuOpen(false);
+      }}
     >
       {label}
     </button>
@@ -106,81 +104,80 @@ const ComponentDetailPage = () => {
       case "overview":
         return (
           <div className="space-y-4">
-            <p className="text-black/70">{componentData.description}</p>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-black/5 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2 flex items-center">
-                  <GitBranch className="mr-2" size={20} />
-                  Framework
-                </h4>
-                <p>{componentData.framework}</p>
-              </div>
-              <div className="bg-black/5 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2 flex items-center">
-                  <Code className="mr-2" size={20} />
-                  Component Type
-                </h4>
-                <p>{componentData.componentType}</p>
-              </div>
-              <div className="bg-black/5 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2 flex items-center">
-                  <UserCircle2 className="mr-2" size={20} />
-                  Author
-                </h4>
-                <p>{componentData?.user?.username}</p>
-              </div>
+            <p className="text-sm md:text-base">{componentData.description}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { 
+                  icon: <GitBranch className="mr-2" size={20} />, 
+                  label: "Framework", 
+                  value: componentData.framework 
+                },
+                { 
+                  icon: <Code className="mr-2" size={20} />, 
+                  label: "Component Type", 
+                  value: componentData.componentType 
+                },
+                { 
+                  icon: <UserCircle2 className="mr-2" size={20} />, 
+                  label: "Author", 
+                  value: componentData?.user?.username || "Anonymous" 
+                }
+              ].map((item, index) => (
+                <div key={index} className="bg-gray-100 p-4 rounded-lg">
+                  <h4 className="font-semibold flex items-center text-sm md:text-base">
+                    {item.icon} {item.label}
+                  </h4>
+                  <p className="text-sm md:text-base">{item.value}</p>
+                </div>
+              ))}
             </div>
           </div>
         );
       case "code":
         return (
-          <div className="relative h-96 overflow-y-scroll">
-            <pre className="bg-black/5 p-4 rounded-lg overflow-x-auto">
-              <code className="text-sm">{componentData.codeSnippet}</code>
+          <div className="relative">
+            <pre className="bg-gray-100 p-2 md:p-4 rounded-lg overflow-x-auto text-xs md:text-base">
+              <code>{componentData.codeSnippet}</code>
             </pre>
             <button
-              className="absolute top-2 right-2 bg-black/10 p-2 rounded hover:bg-black/20 transition-colors"
+              className="absolute top-2 right-2 bg-gray-200 p-1 md:p-2 rounded hover:bg-gray-300"
               onClick={() => {
                 navigator.clipboard.writeText(componentData.codeSnippet);
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               }}
             >
-              {copied ? "Copied!" : <Copy size={20} />}
+              {copied ? "Copied!" : <Copy size={16} md:size={20} />}
             </button>
           </div>
         );
       case "comments":
         return (
-          <div className="space-y-4 h-80 overflow-y-scroll">
-            {commentData?.comments?.length ? (
-              commentData.comments.map((comment, index) => (
-                <div key={index} className="border-b border-black/10 pb-4">
-                  <div className="flex items-center mb-2">
-                    <UserCircle2 className="mr-2" size={24} />
-                    <div>
-                      <p className="font-semibold">{comment.User.Username}</p>
-                      <p className="text-black/60 text-sm">
-                        {new Date(comment.CreatedAt).toLocaleDateString()}
-                      </p>
-                    </div>
+          <div className="space-y-4">
+            {commentData?.comments?.map((comment, index) => (
+              <div key={index} className="border-b pb-4">
+                <div className="flex items-center mb-2">
+                  <UserCircle2 className="mr-2" size={20} />
+                  <div>
+                    <p className="font-semibold text-sm md:text-base">{comment.User.Username}</p>
+                    <p className="text-xs md:text-sm text-gray-500">
+                      {new Date(comment.CreatedAt).toLocaleDateString()}
+                    </p>
                   </div>
-                  <p>{comment.Content}</p>
                 </div>
-              ))
-            ) : (
-              <p>No comments yet...</p>
-            )}
-            <div className="flex items-center space-x-2">
+                <p className="text-sm md:text-base">{comment.Content}</p>
+              </div>
+            ))}
+            <div className="flex space-x-2">
               <input
                 type="text"
                 placeholder="Add a comment..."
-                className="flex-grow p-2 border border-black/20 rounded-lg"
+                className="flex-grow border p-2 rounded-lg text-sm"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
               <button
-                className="bg-black text-white px-4 py-2 rounded-lg"
+                className="bg-black text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm md:text-base"
                 onClick={handlePostComment}
               >
                 Post
@@ -196,96 +193,78 @@ const ComponentDetailPage = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-8 mt-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          {/* Image Carousel Section */}
-          <div className="relative w-full max-w-[570px] mx-auto">
-            {componentData?.images?.length > 0 ? (
+      <div className="container mx-auto px-4 py-8 mt-16">
+        {/* Mobile Tab Menu Toggle */}
+        <div className="md:hidden flex justify-between items-center mb-4">
+          <h1 className="text-xl font-bold">{componentData.title}</h1>
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 bg-gray-100 rounded-lg"
+          >
+            {isMobileMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+
+        {/* Mobile Tab Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden flex justify-between border-b mb-4">
+            <TabButton tab="overview" label="Overview" />
+            <TabButton tab="code" label="Code" />
+            <TabButton tab="comments" label="Comments" />
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Image Carousel */}
+          <div className="relative order-2 md:order-1">
+            {componentData.images?.length > 0 ? (
               <>
-                <div className="rounded-lg overflow-hidden shadow-lg aspect-square">
-                  <img
-                    src={componentData.images[currentImageIndex]}
-                    alt={`Component preview ${currentImageIndex + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {/* Image Navigation */}
-                {componentData.images.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => handleImageChange("prev")}
-                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/20 p-2 rounded-full"
-                    >
-                      <ChevronLeft className="text-white" />
-                    </button>
-                    <button
-                      onClick={() => handleImageChange("next")}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/20 p-2 rounded-full"
-                    >
-                      <ChevronRight className="text-white" />
-                    </button>
-                  </>
-                )}
-                {/* Image Indicators */}
-                <div className="flex justify-center mt-4 space-x-2">
-                  {componentData.images.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`w-2 h-2 rounded-full ${
-                        index === currentImageIndex ? "bg-black" : "bg-black/30"
-                      }`}
-                    />
-                  ))}
-                </div>
+                <img
+                  src={componentData.images[currentImageIndex]}
+                  alt="Preview"
+                  className="rounded-lg w-full h-auto object-cover"
+                />
+                <button
+                  onClick={() => handleImageChange("prev")}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-300 p-1 md:p-2 rounded-full"
+                >
+                  <ChevronLeft size={16} md:size={24} />
+                </button>
+                <button
+                  onClick={() => handleImageChange("next")}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-300 p-1 md:p-2 rounded-full"
+                >
+                  <ChevronRight size={16} md:size={24} />
+                </button>
               </>
             ) : (
-              <div className="h-[570px] w-[570px] flex items-center justify-center bg-black/10 rounded-lg">
-                <p className="text-black/50">No images available</p>
+              <div className="h-48 md:h-80 bg-gray-200 flex items-center justify-center">
+                No images available
               </div>
             )}
           </div>
 
-          {/* Content Section */}
-          <div className="w-full">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-              <div>
-                <h1 className="text-3xl font-bold">{componentData.title}</h1>
-                <div className="flex items-center space-x-4 mt-2 text-black/60">
-                  <div className="flex items-center space-x-1">
-                    <ThumbsUp size={16} />
-                    <span>{componentData.likes}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <ThumbsDown size={16} />
-                    <span>{componentData.dislikes}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Star size={16} />
-                    <span>{componentData.stars} Stars</span>
-                  </div>
-                </div>
+          {/* Details */}
+          <div className="order-1 md:order-2">
+            <h1 className="text-2xl md:text-3xl font-bold mb-4 hidden md:block">
+              {componentData.title}
+            </h1>
+            <div className="flex space-x-4 mb-6 justify-center md:justify-start">
+              <div className="flex items-center">
+                <ThumbsUp className="mr-1" size={16} /> 
+                <span className="text-sm">{componentData.likes}</span>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <button className="bg-black text-white px-4 py-2 rounded-lg flex items-center">
-                  <Download className="mr-2" size={20} />
-                  Download
-                </button>
-                <button className="bg-black/10 px-4 py-2 rounded-lg flex items-center">
-                  <Share2 className="mr-2" size={20} />
-                  Share
-                </button>
+              <div className="flex items-center">
+                <ThumbsDown className="mr-1" size={16} /> 
+                <span className="text-sm">{componentData.dislikes}</span>
               </div>
             </div>
-
-            <div className="border-b border-black/10 mb-6 overflow-x-auto">
-              <nav className="flex space-x-4 min-w-max">
-                <TabButton tab="overview" label="Overview" />
-                <TabButton tab="code" label="Code" />
-                <TabButton tab="comments" label="Comments" />
-              </nav>
+            <div className="border-b mb-4 hidden md:block">
+              <TabButton tab="overview" label="Overview" />
+              <TabButton tab="code" label="Code" />
+              <TabButton tab="comments" label="Comments" />
             </div>
-
-            <div>{renderTabContent()}</div>
+            {renderTabContent()}
           </div>
         </div>
       </div>
@@ -294,4 +273,3 @@ const ComponentDetailPage = () => {
 };
 
 export default ComponentDetailPage;
-
