@@ -24,6 +24,7 @@ import ForgotPasswordPage from "./pages/ForgotPassword";
 import SandboxCreate from "./components/SandboxCreate";
 import Sandbox from "./pages/Sandbox";
 import SandboxDetail from "./pages/SandboxDetail";
+import DiscussionApp from "./pages/Discussion";
 
 const App = () => {
   return (
@@ -98,6 +99,14 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <SandboxDetail />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/discussion"
+              element={
+                <ProtectedRoute>
+                  <DiscussionApp />
                 </ProtectedRoute>
               }
             />

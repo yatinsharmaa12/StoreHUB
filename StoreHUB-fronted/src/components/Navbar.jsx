@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Flame, Book, Plus, UserCircle2 } from "lucide-react";
+import { Home, Flame, Book, Plus, UserCircle2, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -32,6 +32,9 @@ const Navbar = () => {
               </Link>
               <Link to="/sandbox">
                 <NavItem icon={<Book />} label="Sandbox" />
+              </Link>
+              <Link to="/discussion">
+                <NavItem icon={<Users />} label="Discussion" />
               </Link>
             </div>
           </div>
