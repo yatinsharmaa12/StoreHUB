@@ -8,11 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-
 	"github.com/rishyym0927/StoreHUB-auth/config"
 	"github.com/rishyym0927/StoreHUB-auth/controllers"
 	"github.com/rishyym0927/StoreHUB-auth/initializers"
 	"github.com/rishyym0927/StoreHUB-auth/middlewares"
+	"github.com/rishyym0927/StoreHUB-auth/routes"
 )
 
 func init() {
@@ -86,11 +86,11 @@ func main() {
 	r.POST("/comments/:postId", middlewares.RequireAuth, controllers.CreateComment)
 	r.GET("/comments/:postId", middlewares.RequireAuth, controllers.GetPostComments)
 
-
+	// WebSocket routes
+	routes.WebSocketRoutes(r)
 
 	// Like routes
 	r.POST("/likes", middlewares.RequireAuth, controllers.CreateLike)
-
 
 	// Sandbox routes
 	r.POST("/sandbox", middlewares.RequireAuth, controllers.CreateSandbox)
