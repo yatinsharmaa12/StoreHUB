@@ -87,9 +87,9 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
             log.Printf("Error reading message from user %d in channel %s: %v", userIDInt, channel, err)
             break
         }
-		log.Printf("Received message from user %d in channel %s: %s", userIDInt, channel, msg["content"])
+		log.Printf("Received message from user %d in channel %s: %s", userIDInt, channel, msg["Content"])
 
-        content := msg["content"]
+        content := msg["Content"]
         chat := models.Chat{
             UserID:  uint(userIDInt),
             Channel: channel,

@@ -59,9 +59,16 @@ const DiscussionApp = () => {
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+    
+      const mes = {
+        UserID: user.user.id,
+        Content: message.Content,
+        CreatedAt: new Date().toISOString()
+      }
+      console.log(message, mes);
       setMessages(prev => ({
         ...prev,
-        [selectedChannel.id]: [...(prev[selectedChannel.id] || []), message],
+        [selectedChannel.id]: [...(prev[selectedChannel.id] || []), mes],
       }));
     };
 
@@ -114,8 +121,8 @@ const DiscussionApp = () => {
   const handleSendMessage = useCallback(() => {
     if (newMessage.trim() && selectedChannel && socketRef.current) {
       const messagePayload = {
-        content: newMessage,  // Use 'Content' instead of 'text'
-    
+        Content: newMessage,  // Use 'Content' instead of 'text'
+     
       };
       console.log(messagePayload, "Sending message")
 
@@ -125,15 +132,15 @@ const DiscussionApp = () => {
         // Optimistically update the messages state
         const localMessage = {
           id: Date.now(),
-          sender: user.user.id,
+          UserID: user.user.id,
           Content: newMessage,
-          timestamp: new Date().toISOString()
+          CreatedAt: new Date().toISOString()
         };
 
-        setMessages(prev => ({
-          ...prev,
-          [selectedChannel.id]: [...(prev[selectedChannel.id] || []), localMessage],
-        }));
+        // setMessages(prev => ({
+        //   ...prev,
+        //   [selectedChannel.id]: [...(prev[selectedChannel.id] || []), localMessage],
+        // }));
         
         setNewMessage('');
       } else {
