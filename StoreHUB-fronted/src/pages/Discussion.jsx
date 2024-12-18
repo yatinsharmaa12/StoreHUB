@@ -101,6 +101,7 @@ const DiscussionApp = () => {
 
     try {
       const res = await apiClient.get(`/chats?channel=${selectedChannel.id}`);
+      console.log(res.data)
       setMessages(prev => ({
         ...prev,
         [selectedChannel.id]: res.data.chats || [],
@@ -113,11 +114,10 @@ const DiscussionApp = () => {
   const handleSendMessage = useCallback(() => {
     if (newMessage.trim() && selectedChannel && socketRef.current) {
       const messagePayload = {
-        Content: newMessage,  // Use 'Content' instead of 'text'
-        sender: user.name,
-        timestamp: new Date().toISOString(),
-        type: 'text',
+        content: newMessage,  // Use 'Content' instead of 'text'
+    
       };
+      console.log(messagePayload, "Sending message")
 
       if (socketRef.current.readyState === WebSocket.OPEN) {
         socketRef.current.send(JSON.stringify(messagePayload));
@@ -125,7 +125,7 @@ const DiscussionApp = () => {
         // Optimistically update the messages state
         const localMessage = {
           id: Date.now(),
-          sender: user.name,
+          sender: user.user.id,
           Content: newMessage,
           timestamp: new Date().toISOString()
         };
@@ -225,7 +225,7 @@ const DiscussionApp = () => {
         <div className="mt-4 pt-4 border-t border-gray-300 flex items-center">
           <User className="border-black p-1 rounded-full mr-3" />
           <div>
-            <div className="font-bold">{user.name}</div>
+            <div className="font-bold">{user.user.username}</div>
             <div className="text-sm text-gray-500">Online</div>
           </div>
         </div>
@@ -255,10 +255,10 @@ const DiscussionApp = () => {
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center">
                       <User className="mr-2 text-blue-500" size={20} />
-                      <span className="font-bold">{msg.sender}</span>
+                      <span className="font-bold">{msg.UserID}</span>
                     </div>
                     <span className="text-gray-500 text-sm">
-                      {new Date(msg.timestamp).toLocaleString()}
+                      {new Date(msg.CreatedAt).toLocaleString()}
                     </span>
                   </div>
                   <p className="text-gray-700">{msg.Content}</p>
@@ -281,7 +281,6 @@ const DiscussionApp = () => {
                   type="text"
                   value={newMessage}
                   onChange={e => {setNewMessage(e.target.value)
-                    console.log(newMessage)
                   }}
                   placeholder="Type your message..."
                   className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
