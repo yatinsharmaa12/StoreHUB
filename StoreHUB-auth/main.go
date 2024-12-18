@@ -88,6 +88,9 @@ func main() {
 
 	// WebSocket routes
 	routes.WebSocketRoutes(r)
+	
+	//chats
+	r.GET("/chats", middlewares.RequireAuth, controllers.GetChats)
 
 	// Like routes
 	r.POST("/likes", middlewares.RequireAuth, controllers.CreateLike)

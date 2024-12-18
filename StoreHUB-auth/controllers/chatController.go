@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/rishyym0927/StoreHUB-auth/initializers"
 	"github.com/rishyym0927/StoreHUB-auth/models"
+
 )
 
 var upgrader = websocket.Upgrader{
@@ -86,6 +87,7 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
             log.Printf("Error reading message from user %d in channel %s: %v", userIDInt, channel, err)
             break
         }
+		log.Printf("Received message from user %d in channel %s: %s", userIDInt, channel, msg["content"])
 
         content := msg["content"]
         chat := models.Chat{
@@ -129,4 +131,37 @@ func (s *Server) removeConnection(channel string, conn *websocket.Conn) {
 		}
 	}
 	s.channels[channel] = updatedConns
+}
+
+
+//write a function to get chats on query based on cahnnel
+
+func GetChats(c *gin.Context) {
+    channel := c.Query("channel")
+
+    var chats []models.Chat
+    query := initializers.DB
+
+    // Apply filter if channel is provided
+    if channel != "" {
+        query = query.Where("channel = ?", channel)
+    }
+
+    // Execute query
+    if err := query.Find(&chats).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve chats"})
+        return
+    }
+
+    // If no chats are found, return an empty result
+    if len(chats) == 0 {
+        c.JSON(http.StatusOK, gin.H{"chats": []models.Chat{}, "count": 0})
+        return
+    }
+
+    // Respond with retrieved chats
+    c.JSON(http.StatusOK, gin.H{
+        "chats": chats,
+        "count": len(chats),
+    })
 }
