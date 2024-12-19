@@ -1,8 +1,15 @@
+// Set the SameSite and Secure attributes based on the environment
+export const SameSite = process.env.NODE_ENV === 'production' ? 'None' : 'Lax';
+export const secure = process.env.NODE_ENV === 'production';
+
+// Set the authentication token
 export const setAuthToken = (token) => {
-  document.cookie = `Authorization=${token}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax;`;
+  const secureAttribute = secure ? ' Secure;' : '';
+  document.cookie = `Authorization=${token}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=${SameSite};${secureAttribute}`;
   localStorage.setItem("token", token);
-  console.log(document.cookie);
+  console.log("Set Cookie:", document.cookie);
 };
+
 
 export const getAuthToken = () => {
   const cookieToken = document.cookie
