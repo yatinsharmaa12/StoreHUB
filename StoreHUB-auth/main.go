@@ -38,7 +38,7 @@ func main() {
 
 	// CORS middleware configuration
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173","http://16.171.63.105:3000","http://ec2-16-171-63-105.eu-north-1.compute.amazonaws.com:3000","https://a600-2401-4900-884a-9283-7d25-319f-7caa-cc6.ngrok-free.app"},
+		AllowOrigins:     []string{"http://localhost:5173","http://16.171.63.105:3000","https://store-hub-sandy.vercel.app","http://ec2-16-171-63-105.eu-north-1.compute.amazonaws.com:3000","https://a600-2401-4900-884a-9283-7d25-319f-7caa-cc6.ngrok-free.app"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
