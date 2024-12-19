@@ -58,7 +58,7 @@ func main() {
 		// Increment the request counter for this route and method
 		initializers.RequestCounter.WithLabelValues(c.Request.Method, "/").Inc()
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Request allowed",
+			"message": "Request allowed, Github Actions on the go",
 			"time":    time.Now(),
 		})
 	})
