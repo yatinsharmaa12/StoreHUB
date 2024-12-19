@@ -4,7 +4,7 @@ import MainComponentArea from "../components/MainComponentArea";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import { Menu, X } from "lucide-react";
-
+import apiClient from "../utils/apiClient";
 const Dashboard = () => {
   const sampleComponents = [
     {
@@ -25,9 +25,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/posts", {
-          withCredentials: true,
-        });
+        const response = await apiClient.get("/posts");
         console.log("Fetched posts:", response.data);
         setPosts(response.data.posts); // Assuming backend returns 'posts' key
       } catch (error) {
