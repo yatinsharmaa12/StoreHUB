@@ -109,10 +109,19 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create token"})
 		return
 	}
+	fmt.Println("Token generated successfully")
 
 	
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", true, true)
+	//show me cookie
+	cookie, err := c.Cookie("Authorization")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get cookie"})
+		return
+	}
+	fmt.Println("Cookie: ", cookie)
+
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 	
 }
