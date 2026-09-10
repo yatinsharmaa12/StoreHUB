@@ -1,199 +1,191 @@
-# 🚀 StoreHUB: Component Sharing Reimagined
+# 🚀 StoreHUB
+## Where Code Sharing Meets Innovation
 
-## 📖 Overview
+<div align="center">
 
-**StoreHUB** is a cutting-edge collaborative platform designed to revolutionize the way developers share, discover, and integrate code components. Built with a powerful tech stack of React, Go, and MySQL, StoreHUB provides a seamless ecosystem for developers to accelerate their development workflow.
+[![GitHub stars](https://img.shields.io/github/stars/rishyym0927/StoreHUB?style=for-the-badge)](https://github.com/rishyym0927/StoreHUB/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/rishyym0927/StoreHUB?style=for-the-badge)](https://github.com/rishyym0927/StoreHUB/network)
+[![GitHub issues](https://img.shields.io/github/issues/rishyym0927/StoreHUB?style=for-the-badge)](https://github.com/rishyym0927/StoreHUB/issues)
+[![GitHub license](https://img.shields.io/github/license/rishyym0927/StoreHUB?style=for-the-badge)](https://github.com/rishyym0927/StoreHUB/blob/main/LICENSE)
 
-## ✨ Key Features
-
-- 🔍 **Comprehensive Component Library**: Browse and search through a diverse collection of reusable components
-- 🤝 **Community-Driven**: Upload, share, and collaborate on innovative code snippets
-- 🌐 **Multi-Framework Support**: Components spanning various frameworks and technologies
-- 🔒 **Secure Authentication**: Robust user management and access controls
-- 📊 **Detailed Component Insights**: Ratings, usage statistics, and community feedback
-
-## 🛠 Tech Stack
-
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| React | Frontend Framework | 18.x |
-| Golang | Backend Services | 1.20+ |
-| MySQL | Database Management | 8.0+ |
-| Tailwind CSS | Styling | 3.x |
-| JWT | Authentication | - |
-
-## 🚦 Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- 🟢 Node.js (v16 or later)
-- 🐹 Golang (v1.20 or later)
-- 🐬 MySQL (v8.0 or later)
-- 📦 npm (v8 or later)
-
-## 🔧 Installation & Setup
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/yourusername/storehub.git
-cd storehub
-```
-
-### 2. Frontend Setup
-```bash
-# Navigate to frontend directory
-cd frontend
-
-# Install dependencies
-npm install
-
-# Create environment file
-cp .env.example .env
-
-# Start development server
-npm start
-```
-
-### 3. Backend Setup
-```bash
-# Navigate to backend directory
-cd ../backend
-
-# Download dependencies
-go mod tidy
-
-# Set up configuration
-cp config.example.yaml config.yaml
-
-# Run database migrations
-go run migrate/migrate.go
-
-# Start backend server
-go run main.go
-```
-
-### 4. Database Configuration
-1. Create a MySQL database.
-2. Update `backend/config.yaml` with your database credentials.
-3. Run database migrations to set up schema.
+</div>
 
 ---
 
-## 🔐 Environment Variables
+## 🌟 Why StoreHUB?
 
-### Frontend (`.env`)
-```
-REACT_APP_API_BASE_URL=http://localhost:8080
-REACT_APP_GITHUB_CLIENT_ID=your_github_client_id
-```
+StoreHUB transforms component sharing into a seamless experience. Built by developers, for developers, it's where innovation meets practicality.
 
-### Backend (`config.yaml`)
-```yaml
-database:
-  host: localhost
-  port: 3306
-  username: your_username
-  password: your_password
-  dbname: storehub
+🔹 **Post Components in Any Framework** – Share your work effortlessly.  
+🔹 **Engage & Collaborate** – Like, comment, and use components from others.  
+🔹 **Sandboxed Projects** – Upload complete projects with real-time community feedback.  
+🔹 **Multi-Framework Support** – React, Vue, Angular, and more!  
 
-server:
-  port: 8080
-  jwt_secret: your_jwt_secret
-```
-
-### Email Setup
-
-To enable email functionality (for sending emails like post creation notifications), you need to set up an email service using SMTP (e.g., Gmail). Follow these steps:
-
-1. **Gmail SMTP Configuration**:  
-   - You need to create a Google App Password if you're using Gmail with 2-factor authentication enabled.
-   - Go to your Google account -> Security -> App Passwords -> Create a new app password for your application.
-   - Add the following environment variables to your `.env` file:
-     - `EMAIL`: Your Gmail address (e.g., `your-email@gmail.com`).
-     - `PASSWORD`: The app password generated in the previous step.
-
-2. **Other Email Providers**:  
-   If you're using a different email provider (e.g., SendGrid, Mailgun), replace the SMTP configuration in the code accordingly and set up the relevant credentials.
+Join a vibrant developer community where innovation thrives! 🚀
 
 ---
 
-### Sample `.env` File
+## 🎯 Features That Set Us Apart
 
-Below is an example of what your `.env` file should look like. Copy this content into your `.env` file and replace the placeholders with your actual credentials.
+| Feature              | Description                                | Status       |
+|----------------------|--------------------------------------------|--------------|
+| 🔍 **Component Sharing** | Easily discover & share components    | ✅ Live      |
+| 🤝 **Collaboration**     | Real-time co-editing support          | ✅ Live      |
+| 🌐 **Multi-Framework**   | Support for React, Vue, Angular       | ✅ Live      |
+| 🔒 **Enterprise Security** | SOC2 & GDPR compliant               | 🛧 Coming Soon |
+| 📊 **Analytics**         | Usage insights & metrics              | 🛧 Coming Soon |
 
-```env
-# Server Port
-PORT=3000  # The port your backend server will run on.
+---
 
-# Production Database URL
-DB_PRODUCTION="mysql://<username>:<password>@<host>:<port>/<database>?ssl-mode=REQUIRED"  
-# Replace `<username>`, `<password>`, `<host>`, `<port>`, and `<database>` with your production database credentials.
+## 🛠️ Tech Stack
 
-# JWT Secret Key
-JWTSECRET=<your_jwt_secret>  
-# Secret key used for signing JSON Web Tokens. Replace `<your_jwt_secret>` with your key.
+### Frontend
 
-# Environment
-ENV=<environment_name>  
-# Define the environment, e.g., "production" or "development".
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-# Development Database URL
-DB_DEVELOPMENT="<username>:<password>@tcp(<host>:<port>)/<database>?charset=utf8mb4&parseTime=True&loc=Local"  
-# Replace `<username>`, `<password>`, `<host>`, `<port>`, and `<database>` with your development database credentials.
+### Backend
 
-# Email Configuration (for sending emails)
-EMAIL=<your_email_address>  # Your email address (e.g., your-email@gmail.com).
-PASSWORD=<your_email_app_password>  # Your email app password (for Gmail, generate one from your Google account).
-```
+![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
+
+---
+
+## 🚀 Quick Start
+
+### 📌 Backend and Database Setup
+
+1. **Navigate to the Backend Directory**:
+   ```bash
+   cd StoreHUB-auth
+   ```
+2. **Set Up the Database**:
+   - **Using Aiven (Cloud Database)**:
+     - Sign up at [Aiven](https://aiven.com) and create a MySQL service.
+     - Copy the connection URI into `.env` under `DATABASE_URL`.
+   - **Setting Up MySQL Locally**:
+     - **Windows**: [MySQL Installer](https://dev.mysql.com/downloads/installer/)
+     - **MacOS**:
+       ```bash
+       brew install mysql
+       brew services start mysql
+       ```
+     - **Linux (Ubuntu/Debian)**:
+       ```bash
+       sudo apt update && sudo apt install mysql-server -y
+       sudo systemctl start mysql
+       ```
+3. **Configure Environment Variables**:
+   ```bash
+   cp .env.example .env
+   ```
+   Update `.env` with necessary credentials.
+4. **Install Backend Dependencies**:
+   ```bash
+   go mod tidy
+   ```
+5. **Start Essential Services** (Recommended: Docker Compose):
+   ```bash
+   docker-compose up --build
+   ```
+6. **Run Backend Manually**:
+   ```bash
+   go run main.go
+   ```
+
+### 🌐 Frontend Installation (React + Vite)
+
+1. **Navigate to the frontend directory**:
+   ```bash
+   cd StoreHUB-frontend
+   ```
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Configure Environment Variables**:
+   ```bash
+   cp .env.example .env
+   ```
+4. **Start the Development Server**:
+   ```bash
+   npm run dev
+   ```
+   Visit `http://localhost:5173` to access the frontend! 🎉
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+We believe in the power of community! 🚀
 
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. 🍴 **Fork the repository**
+2. 🌱 **Create a new branch**:
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+3. ✍️ **Commit changes**:
+   ```bash
+   git commit -m 'Add AmazingFeature'
+   ```
+4. 🚀 **Push your branch**:
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
+5. 🎉 **Open a Pull Request**
 
-### Contribution Guidelines
-- Follow existing code style
-- Write tests for new features
-- Update documentation
-- Ensure CI checks pass
-
-## 🧪 Running Tests
-
-### Frontend Tests
-```bash
-cd frontend
-npm test
-```
-
-### Backend Tests
-```bash
-cd backend
-go test ./...
-```
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/storehub)](https://star-history.com/#yourusername/storehub)
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-- Open a GitHub Issue
-- Join our [Discord Community](https://discord.gg/your-invite-link)
-- Email: support@storehub.dev
+Your contributions make StoreHUB better! 🔥
 
 ---
 
-**Happy Coding! 👩‍💻👨‍💻**
+## 💻 Environment Setup
+
+- **Frontend**:
+  - Node.js v16+
+  - NPM or Yarn
+- **Backend**:
+  - Go 1.18+
+  - MySQL database
+  - Redis server
+
+---
+
+## 📝 License
+
+StoreHUB is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for details.
+
+---
+
+## 🌟 Our Contributors
+
+<div align="center">
+
+[![Contributors](https://contrib.rocks/image?repo=rishyym0927/StoreHUB)](https://github.com/rishyym0927/StoreHUB/graphs/contributors)
+
+</div>
+
+---
+
+## 📞 Support
+
+<div align="center">
+
+[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:support@storehub.dev)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/your-invite-link)
+[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/storehub)
+
+</div>
+
+---
+
+<div align="center">
+
+Made with ❤️ by the **StoreHUB Team**
+
+[⬆ Back to top](#-storehub)
+
+</div>
 
